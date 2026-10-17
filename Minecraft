@@ -1,4 +1,4 @@
--- Delta Minecraft V0.23 (one script, client-side only)
+-- Delta Minecraft V0.28 (one script, client-side only)
 -- Place blocks on any part of the game. Per-face textures, fixed (world-aligned) blocks,
 -- creative menu with 7 top + 7 bottom tabs, hotbar in every tab, dropped items in survival.
 local Players = game:GetService("Players")
@@ -22,6 +22,10 @@ local WHITE = Color3.new(1, 1, 1)
 --
 --   Block{ Name = "", Tab = "", Color = C(r,g,b),
 --          Texture = { Top = "", Bottom = "", Left = "", Right = "", Front = "", Back = "" } }
+--
+--   Slab{ ... }  Stairs{ ... }  Fence{ ... }  FenceGate{ ... }  Door{ ... }
+--     exactly the same lines as Block{ ... } (Name, Tab, Color, Texture ...) - you just get that SHAPE with your textures.
+--     Optional  Base = "Oak Planks"  adds crafting recipes (slab, stairs, fence, gate) made from that block.
 --
 --   Face shortcuts inside Texture (explicit faces always win):
 --     All       = one image for all 6 faces      (or  Texture = "rbxassetid://...")
@@ -127,6 +131,13 @@ local function Item(d)
 	register(d)
 end
 
+-- Slab{...} Stairs{...} Fence{...} FenceGate{...} Door{...}: like Block{...} but with that shape (also work in your Pastebin)
+local Slab, Stairs, Fence, FenceGate, Door
+do
+	local function make(shape) return function(d) d.Shape = shape Block(d) end end
+	Slab, Stairs, Fence, FenceGate, Door = make("Slab"), make("Stairs"), make("Fence"), make("FenceGate"), make("Door")
+end
+
 local WOOL = "rbxassetid://18699165714"
 
 -- ---- Building Blocks ----
@@ -154,11 +165,17 @@ local function addShapes(base)                       -- same texture / color / t
 	for _, shape in ipairs({"Slab", "Stairs"}) do
 		local d = {}
 		for k, v in pairs(BY_NAME[base]) do d[k] = v end
-		d.Name, d.Shape, d.Shapes = base .. " " .. shape, shape, nil
+		d.Name, d.Shape, d.Shapes, d.Base = base .. " " .. shape, shape, nil, base
 		register(d)
 	end
 end
 for _, base in ipairs({"Stone", "Cobblestone", "Oak Planks", "Bricks"}) do addShapes(base) end
+
+-- fences + gates: placed in the MIDDLE of the block; the gate opens / closes instantly
+Fence{Name = "Oak Fence", Tab = "Building Blocks", Color = C(190, 145, 80), Material = Enum.Material.Wood, Base = "Oak Planks",
+	Texture = {All = "rbxassetid://7388983206"}}
+FenceGate{Name = "Oak Fence Gate", Tab = "Building Blocks", Color = C(190, 145, 80), Material = Enum.Material.Wood, Base = "Oak Planks",
+	Texture = {All = "rbxassetid://7388983206"}}
 
 -- ---- Colored Blocks (the wool image, tinted) ----
 for _, w in ipairs({
@@ -260,6 +277,8 @@ Item{Name = "Debug Stick", Tab = "Operator Utilities", Color = C(130, 190, 220),
 --   1) Make a paste on pastebin.com with lines like:
 --        Block{Name = "Ruby Block", Tab = "Building Blocks", Color = C(200, 20, 60), Texture = {All = "rbxassetid://123456"}}
 --        (add  Shapes = true  to a Block to also get its Slab + Stairs with the same texture)
+--        Slab{Name = "Ruby Slab", Tab = "Building Blocks", Color = C(200, 20, 60), Texture = {Top = "", Side = ""}}
+--        Stairs{...}  Fence{...}  FenceGate{...}  Door{...}  work in a paste too
 --        Item{Name = "Ruby Sword", Tab = "Combat", Front = "rbxassetid://654321", Stack = 1}
 --   2) Click "raw" on the paste and copy that link (https://pastebin.com/raw/XXXXXXXX)
 --   3) Paste it between the quotes below (you can add several links)
@@ -275,13 +294,13 @@ for _, url in ipairs(PASTEBIN_URLS) do
 		end
 		if ok and type(src) == "string" then
 			local before = #ITEMS
-			local fn, err = loadstring("local Block, Item, C = ...\n" .. src)
+			local fn, err = loadstring("local Block, Item, C, Slab, Stairs, Fence, FenceGate, Door = ...\n" .. src)
 			if fn then
 				local function PBlock(d)                       -- Block{..., Shapes = true} also makes "<name> Slab" and "<name> Stairs"
 					Block(d)
 					if d.Shapes then addShapes(d.Name) end
 				end
-				local ran, e2 = pcall(fn, PBlock, Item, C)
+				local ran, e2 = pcall(fn, PBlock, Item, C, Slab, Stairs, Fence, FenceGate, Door)
 				if not ran then warn("Pastebin script error: " .. tostring(e2)) end
 			else
 				warn("Pastebin script has a mistake: " .. tostring(err))
@@ -377,6 +396,26 @@ function UI.axis()                                  -- that direction snapped to
 	return Vector3.new(0, 0, look.Z > 0 and 1 or -1)
 end
 
+-- creative list order (like Minecraft):  Oak Planks, Oak Planks Slab, Oak Planks Stairs, Oak Fence, Oak Fence Gate
+do
+	local rank = {Slab = 1, Stairs = 2, Fence = 3, FenceGate = 4}
+	local variants, rest = {}, {}
+	for _, d in ipairs(ITEMS) do
+		if d.Base and BY_NAME[d.Base] and rank[d.Shape] then
+			variants[d.Base] = variants[d.Base] or {}
+			table.insert(variants[d.Base], d)
+		else
+			rest[#rest + 1] = d
+		end
+	end
+	for _, list in pairs(variants) do table.sort(list, function(a, b) return rank[a.Shape] < rank[b.Shape] end) end
+	table.clear(ITEMS)
+	for _, d in ipairs(rest) do
+		ITEMS[#ITEMS + 1] = d
+		for _, v in ipairs(variants[d.Name] or {}) do ITEMS[#ITEMS + 1] = v end
+	end
+end
+
 -- how a block is turned when placed
 local function blockCFrame(pos, def, n, r)
 	if def.Pillar and n then                         -- logs: top follows the face you clicked
@@ -398,7 +437,8 @@ local function buildShape(d, S, cf, parent, flip)
 			Material = d.Material or Enum.Material.SmoothPlastic, Transparency = d.Clear and 1 or d.Transparency or 0,
 			TopSurface = Enum.SurfaceType.Smooth, BottomSurface = Enum.SurfaceType.Smooth}, nil)
 		for face, id in pairs(d.Texture) do
-			new("Texture", {Texture = id, Face = FACE[face], StudsPerTileU = S, StudsPerTileV = S, Color3 = d.Tint or WHITE, Transparency = d.Clear and 0.2 or 0}, p)
+			new("Texture", {Texture = id, Face = FACE[face], StudsPerTileU = S, StudsPerTileV = (d.Shape == "Door" and (face == "Front" or face == "Back")) and S * 2 or S,
+				Color3 = d.Tint or WHITE, Transparency = d.Clear and 0.2 or 0}, p)
 		end
 		p.Parent = par
 		return p
@@ -406,6 +446,34 @@ local function buildShape(d, S, cf, parent, flip)
 	local y = flip and h / 2 or -h / 2
 	if d.Shape == "Door" then                         -- 2 blocks tall thin panel, flush with the FRONT edge of the block (toward you)
 		return box(Vector3.new(S, S * 2, S * 0.18), Vector3.new(0, S / 2, -S / 2 + S * 0.09), "Door", parent)
+	end
+	local u = S / 16                                  -- one "pixel" of a 16x16 block
+	local zc = 0                                      -- fence / gate: in the MIDDLE of the block
+	if d.Shape == "Fence" then                        -- a post + two rails across the block
+		local m = new("Model", {Name = "Fence"}, nil)
+		box(Vector3.new(4 * u, S, 4 * u), Vector3.new(0, 0, zc), "Post", m)
+		for _, ry in ipairs({-0.5 * u, 5.5 * u}) do
+			box(Vector3.new(S, 3 * u, 2 * u), Vector3.new(0, ry, zc), "Rail", m)
+		end
+		m.WorldPivot = cf
+		m.Parent = parent
+		return m
+	end
+	if d.Shape == "FenceGate" then                    -- two posts + two leaves; right-click turns each leaf 90 degrees around its post
+		local m = new("Model", {Name = "FenceGate"}, nil)
+		for _, side in ipairs({-1, 1}) do
+			box(Vector3.new(2 * u, 11 * u, 4 * u), Vector3.new(side * 7 * u, 2.5 * u, zc), "Post", m)
+			local half = new("Model", {Name = side < 0 and "HalfL" or "HalfR"}, nil)
+			for _, ry in ipairs({-0.5 * u, 5.5 * u}) do
+				box(Vector3.new(6 * u, 3 * u, 2 * u), Vector3.new(side * 3 * u, ry, zc), "Rail", half)
+			end
+			box(Vector3.new(2 * u, 9 * u, 2 * u), Vector3.new(side * u, 2.5 * u, zc), "Stile", half)
+			half.WorldPivot = cf * CFrame.new(side * 7 * u, 0, zc)
+			half.Parent = m
+		end
+		m.WorldPivot = cf
+		m.Parent = parent
+		return m
 	end
 	if d.Shape == "Slab" then
 		return box(Vector3.new(S, h, S), Vector3.new(0, y, 0), "Slab", parent)
@@ -442,7 +510,7 @@ local function makeBlock(pos, def, n, r, flip, face)
 	root:SetAttribute("BlockType", def.Name)
 	root:SetAttribute("Cell", pos)                 -- the grid cell it sits in (slabs only fill half of it)
 	root:SetAttribute("Flip", flip and true or false)
-	if def.Shape == "Door" then root:SetAttribute("Open", false) root:SetAttribute("Face", face or Vector3.zAxis) end
+	if def.Shape == "Door" or def.Shape == "FenceGate" then root:SetAttribute("Open", false) root:SetAttribute("Face", face or Vector3.zAxis) end
 	return root
 end
 
@@ -491,7 +559,8 @@ local function fillCube(vf, d)
 	vf:SetAttribute("def", d.Name)
 	vf:ClearAllChildren()
 	if d.Shape then
-		buildShape(d, 1, CFrame.new(), vf, false)
+		local sc = d.Shape == "Door" and 0.55 or 1                      -- a door is 2 blocks tall: draw it smaller so it fits
+		buildShape(d, sc, CFrame.new(0, d.Shape == "Door" and -sc / 2 or 0, 0), vf, false)
 	else
 		local p = new("Part", {Size = Vector3.one, Anchored = true, Color = d.Color, Material = d.Material or Enum.Material.SmoothPlastic,
 			Transparency = d.Clear and 1 or d.Transparency or 0}, vf)
@@ -640,18 +709,48 @@ end
 -- Hand (bottom right): shows the selected block / item and swings when you place or break
 --====================================================================
 local SKIN, SKIN_DARK, SLEEVE = C(214, 158, 118), C(176, 122, 86), C(58, 112, 170)
-local HAND_POS = UDim2.new(0.9, 0, 1, 30)
+local HAND_POS = UDim2.new(1, 0, 1, 30)
 local handBob = new("Frame", {Name = "HandBob", Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, Active = false, ZIndex = 1}, gui)
-local handRoot = new("Frame", {Name = "Hand", AnchorPoint = Vector2.new(1, 1), Position = HAND_POS, Size = UDim2.fromOffset(150, 200),
+local handRoot = new("Frame", {Name = "Hand", AnchorPoint = Vector2.new(1, 1), Position = HAND_POS, Size = UDim2.new(0.36, 0, 0.72, 0),
 	BackgroundTransparency = 1, Active = false, ZIndex = 1}, handBob)
 local handScale = new("UIScale", {}, handRoot)
-local ARM_IMAGE = "rbxassetid://16742675746"
 local ARM_UP, ARM_DOWN = UDim2.new(0.5, 0, 1, 0), UDim2.new(0.5, 0, 1, 240)
-local arm = new("ImageLabel", {AnchorPoint = Vector2.new(0.5, 1), Position = ARM_UP, Size = UDim2.fromOffset(150, 200),
-	BackgroundTransparency = 1, Image = ARM_IMAGE, ScaleType = Enum.ScaleType.Fit, ResampleMode = Enum.ResamplerMode.Pixelated,
-	Rotation = 0, ZIndex = 2}, handRoot)
-local held = new("Frame", {AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromOffset(64, 118), Size = UDim2.fromOffset(260, 260),
+-- a real 3D arm (ViewportFrame): it comes in from the bottom right and swings forward when you place / break
+local arm = new("ViewportFrame", {AnchorPoint = Vector2.new(0.5, 1), Position = ARM_UP, Size = UDim2.new(1, 0, 0.72, 0),
+	BackgroundTransparency = 1, ZIndex = 2, Ambient = C(150, 150, 150), LightColor = WHITE, LightDirection = Vector3.new(-0.5, -1, -0.6)}, handRoot)
+arm.CurrentCamera = new("Camera", {FieldOfView = 48, CFrame = CFrame.new()}, arm)
+UI.armVP = arm
+-- arm pose: position (X, Y, Z) and turn in degrees (X, Y, Z). The hand end points UP and to the LEFT, like Minecraft.
+-- (Y = -45 made it lean the other way.) Change these numbers to turn the arm.
+UI.ARM_POS, UI.ARM_ROT = Vector3.new(0.55, -0.7, -2.4), Vector3.new(140, 45, 5)
+UI.armBase = CFrame.new(UI.ARM_POS) * CFrame.fromOrientation(math.rad(UI.ARM_ROT.X), math.rad(UI.ARM_ROT.Y), math.rad(UI.ARM_ROT.Z))
+UI.armShoulder = UI.armBase * Vector3.new(0, 1.03, 0)   -- the arm swings around this point
+
+function UI.buildArm(meshArm)                       -- meshArm = the arm wearing the skin (nil = simple boxes)
+	if UI.armModel then UI.armModel:Destroy() end
+	local m = new("Model", {Name = "Arm3D"}, nil)
+	local function box(size, off, col)
+		new("Part", {Size = size, CFrame = UI.armBase * CFrame.new(off), Anchored = true, Color = col, Material = Enum.Material.SmoothPlastic,
+			TopSurface = Enum.SurfaceType.Smooth, BottomSurface = Enum.SurfaceType.Smooth}, m)
+	end
+	if meshArm then
+		meshArm.Anchored = true
+		meshArm.CFrame = UI.armBase
+		meshArm.Parent = m
+	else
+		box(Vector3.new(0.7, 2, 0.55), Vector3.zero, SKIN)
+		box(Vector3.new(0.74, 0.85, 0.59), Vector3.new(0, 0.6, 0), C(0, 170, 170))   -- sleeve at the shoulder end
+	end
+	m.WorldPivot = UI.armBase
+	m.Parent = UI.armVP
+	UI.armModel = m
+end
+UI.buildArm()
+-- where the item in your hand sits, and how big it is (relative to the hand area). Change these two to move / resize it.
+UI.HELD_POS, UI.HELD_SIZE = UDim2.new(0.7, 0, 0.7, 0), UDim2.new(1, 0, 1, 0)
+local held = new("Frame", {AnchorPoint = Vector2.new(0.5, 0.5), Position = UI.HELD_POS, Size = UI.HELD_SIZE,
 	BorderSizePixel = 0, Visible = false, Rotation = 8, ZIndex = 4}, handRoot)
+new("UIAspectRatioConstraint", {AspectRatio = 1}, held)     -- stays square, so tools are never stretched wide
 local heldIc = mkIcon(held, 5, "held")
 local heldLbl = new("TextLabel", {Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, Font = Enum.Font.GothamBold, TextSize = 10,
 	TextWrapped = true, TextColor3 = WHITE, TextStrokeTransparency = 0.3, Text = "", ZIndex = 6}, held)
@@ -670,12 +769,9 @@ function updateHand()
 		held.BackgroundColor3 = d.Color
 		held.BackgroundTransparency = bgT(d)
 		if d.IsBlock then                                                          -- blocks sit turned a little, like Minecraft
-			held.Rotation, held.Size, held.Position = -6, UDim2.fromOffset(260, 260), UDim2.fromOffset(64, 118)
+			held.Rotation, held.Size, held.Position = -6, UI.HELD_SIZE, UI.HELD_POS
 		else                                                                       -- tools: big, handle in the hand, blade pointing up-right
-			local big = iconOf(d) ~= nil
-			held.Rotation = 0
-			held.Size = big and UDim2.fromOffset(300, 300) or UDim2.fromOffset(120, 120)
-			held.Position = big and UDim2.fromOffset(187, 63) or UDim2.fromOffset(75, 150)
+			held.Rotation, held.Size, held.Position = 0, UI.HELD_SIZE, UI.HELD_POS
 		end
 		setIcon(heldIc, d)
 		heldLbl.Text = (not d.IsBlock and not iconOf(d)) and d.Name or ""
@@ -692,6 +788,7 @@ local swinging = false
 local function swing()
 	if swinging then return end
 	swinging = true
+	UI.swingAt = os.clock()
 	if UI.swing3D then UI.swing3D() end
 	task.spawn(function()
 		pcall(function()
@@ -1019,10 +1116,11 @@ do
 	shaped("Diamond Pickaxe", 1, {"DDD", " S ", " S "}, {D = "Diamond", S = "Stick"})
 	shaped("Iron Sword", 1, {"I", "I", "S"}, {I = "Iron Ingot", S = "Stick"})
 	for _, d in ipairs(ITEMS) do
-		if d.Shape == "Slab" then
-			local base = d.Name:gsub(" Slab$", "")
-			shaped(base .. " Slab", 6, {"BBB"}, {B = base})
-			shaped(base .. " Stairs", 4, {"B  ", "BB ", "BBB"}, {B = base})
+		if d.Base and BY_NAME[d.Base] then
+			if d.Shape == "Slab" then shaped(d.Name, 6, {"BBB"}, {B = d.Base})
+			elseif d.Shape == "Stairs" then shaped(d.Name, 4, {"B  ", "BB ", "BBB"}, {B = d.Base})
+			elseif d.Shape == "Fence" then shaped(d.Name, 3, {"BSB", "BSB"}, {B = d.Base, S = "Stick"})
+			elseif d.Shape == "FenceGate" then shaped(d.Name, 1, {"SBS", "SBS"}, {B = d.Base, S = "Stick"}) end
 		end
 	end
 
@@ -1156,7 +1254,7 @@ do
 	end
 
 	function UI.sync()                               -- one place that decides "is a screen open?"
-		panelOpen = win.Visible or cwin.Visible or UI.menu.Visible or UI.xst ~= nil
+		panelOpen = win.Visible or cwin.Visible or UI.menu.Visible or UI.xst ~= nil or UI.dead == true
 		UI.modal.Visible = panelOpen
 		UI.refreshHand()
 	end
@@ -1544,12 +1642,39 @@ do
 	end)
 
 	O.sub("Skin Customization", function(P)
-		O.toggle(P, 60, 32, 300, "Accessories", "acc", function() UI.applySkin() end)
-		O.toggle(P, 60, 68, 300, "Hide My Character", "hideBody", function() UI.applySkin() end)
-		O.toggle(P, 60, 104, 300, "Steve Model", "steve", function() UI.buildSteve() UI.applySkin() end)
-		O.toggle(P, 60, 140, 300, "Steve Skin (meshes)", "skin", function() UI.buildSteve() UI.applySkin() end)
-		O.toggle(P, 60, 176, 300, "Skin 2nd Layer", "layer2", function() UI.buildSteve() UI.applySkin() end)
-		O.text(P, "This only changes what you see.", 214, 16)
+		O.toggle(P, 60, 26, 300, "Accessories", "acc", function() UI.applySkin() end)
+		O.toggle(P, 60, 60, 300, "Hide My Character", "hideBody", function() UI.applySkin() end)
+		O.toggle(P, 60, 94, 300, "Steve Model", "steve", function() UI.buildSteve() UI.applySkin() end)
+		O.toggle(P, 60, 128, 300, "Steve Skin (meshes)", "skin", function() UI.buildSteve() UI.buildArmMesh() UI.applySkin() end)
+		O.toggle(P, 60, 162, 300, "Skin 2nd Layer", "layer2", function() UI.buildSteve() UI.applySkin() end)
+		O.fit(btn(P, "Custom Skin Texture...", 60, 198, 300, function()
+			if O.refresh["Custom Skin Texture"] then O.refresh["Custom Skin Texture"]() end
+			O.show(O.subs["Custom Skin Texture"])
+		end))
+		O.text(P, "This only changes what you see.", 232, 12)
+	end)
+
+	O.sub("Custom Skin Texture", function(P)          -- type the image id of any skin texture (64x64 Minecraft skin layout)
+		O.text(P, "Paste the image id (or link) of a skin texture.\nIt has to be a normal 64x64 Minecraft skin image.", 28, 36)
+		local box = new("TextBox", {Position = UDim2.fromOffset(60, 76), Size = UDim2.fromOffset(300, 32), BackgroundColor3 = C(20, 20, 22),
+			BorderSizePixel = 0, Text = "", PlaceholderText = "skin image id", PlaceholderColor3 = C(120, 120, 125), TextColor3 = WHITE,
+			TextSize = 12, ClearTextOnFocus = false, ZIndex = 32}, P)
+		pixelFont(box)
+		new("UIStroke", {Color = Color3.new(0, 0, 0), Thickness = 2, ApplyStrokeMode = Enum.ApplyStrokeMode.Border}, box)
+		local status = O.text(P, "", 156, 40)
+		btn(P, "Apply Skin", 60, 116, 145, function()
+			if UI.setSkin(box.Text) then
+				status.Text = UI.opt.steve and UI.opt.skin and "Skin applied (loading...)" or "Saved. Turn ON  Steve Model + Steve Skin  to see it."
+			else
+				status.Text = "That is not an image id."
+			end
+		end)
+		btn(P, "Reset to Steve", 215, 116, 145, function()
+			UI.setSkin(UI.skinDefault)
+			box.Text = ""
+			status.Text = "Back to the Steve skin."
+		end)
+		O.refresh["Custom Skin Texture"] = function() box.Text = tostring(UI.skinId):match("%d+") or "" status.Text = "" end
 	end)
 
 	O.sub("Music & Sounds", function(P)
@@ -1646,6 +1771,12 @@ do
 		menu.Visible = open
 		stopBreak()
 		UI.sync()
+	end
+
+	function UI.openOptions()                         -- the game menu, straight on the Options screen
+		UI.setMenu(true)
+		UI.refreshOpts()
+		O.show(optP)
 	end
 end
 
@@ -2118,6 +2249,21 @@ function UI.toggleDoor(root)                         -- right-click a door: open
 	end
 end
 
+function UI.toggleGate(root)                         -- right-click a fence gate: opens / closes INSTANTLY (no animation)
+	local open = not root:GetAttribute("Open")
+	root:SetAttribute("Open", open)
+	local cell, face = root:GetAttribute("Cell"), root:GetAttribute("Face") or Vector3.zAxis
+	local cf = CFrame.lookAt(cell, cell - face)       -- its local -Z points toward the player
+	local u = BLOCK / 16
+	for _, side in ipairs({-1, 1}) do
+		local half = root:FindFirstChild(side < 0 and "HalfL" or "HalfR")
+		if half then
+			local pivot = cf * CFrame.new(side * 7 * u, 0, 0)
+			half:PivotTo(open and pivot * CFrame.Angles(0, math.rad(90 * side), 0) or pivot)   -- both leaves fold into the block, away from you
+		end
+	end
+end
+
 local function useItem(idx)
 	local s = inv[idx]
 	s.count -= 1
@@ -2141,9 +2287,10 @@ local function doAction(action, pt)   -- right click / PLACE
 		return
 	end
 
-	if clicked and clicked:GetAttribute("BlockType") == "Oak Door" and not (MV.sneakHeld or MV.sneakTog) then
+	local cdef = clicked and BY_NAME[clicked:GetAttribute("BlockType") or ""]
+	if cdef and (cdef.Shape == "Door" or cdef.Shape == "FenceGate") and not (MV.sneakHeld or MV.sneakTog) then
 		swing()
-		UI.toggleDoor(clicked)                       -- right-click a door = open / close
+		if cdef.Shape == "Door" then UI.toggleDoor(clicked) else UI.toggleGate(clicked) end   -- right-click = open / close (instant)
 		return
 	end
 	if clicked and not (MV.sneakHeld or MV.sneakTog) then
@@ -2393,6 +2540,12 @@ on(RS.RenderStepped, function(dt)
 	UI.bobT += dt * (moving and (sprint and 13 or (sneak and 6 or 9)) or 0)
 	local idle = math.sin(os.clock() * 1.5) * 2.5 * (1 - UI.bobA)
 	handBob.Position = UI.opt.bob and UDim2.fromOffset(math.cos(UI.bobT) * 8 * UI.bobA, math.abs(math.sin(UI.bobT)) * 10 * UI.bobA + idle) or UDim2.fromOffset(0, 0)
+	if UI.armModel and handRoot.Visible then            -- swing the 3D arm forward around the shoulder, then back
+		local k = UI.swingAt and math.clamp((os.clock() - UI.swingAt) / 0.3, 0, 1) or 1
+		local sw = math.sin(k * math.pi)
+		local p = UI.armShoulder
+		UI.armModel:PivotTo(CFrame.new(p) * CFrame.Angles(-0.9 * sw, 0.35 * sw, 0.25 * sw) * CFrame.new(-p) * UI.armBase)
+	end
 end)
 
 local function center() return Workspace.CurrentCamera.ViewportSize / 2 end
@@ -2430,7 +2583,8 @@ end
 --====================================================================
 do
 	local AssetService = game:GetService("AssetService")
-	local SKIN_ID = "rbxassetid://8028692999"        -- the Steve skin image (change the id to use another skin)
+	UI.skinDefault = "rbxassetid://8028692999"       -- the Steve skin image (Options > Skin Customization > Custom Skin Texture changes it)
+	UI.skinId = UI.skinDefault
 	local SKIN, SHIRT, PANTS = C(198, 140, 100), C(0, 170, 170), C(60, 60, 150)   -- colors for the box fallback
 	local MESH = {   -- key = {mesh id, size, fallback color, R6 part, R15 part, 2nd-layer mesh id, 2nd-layer size}
 		Head     = {6814397315, Vector3.new(1.371, 1.371, 1.371), SKIN,  "Head", "Head", 6814398336, Vector3.new(1.509, 1.509, 1.509)},
@@ -2451,7 +2605,7 @@ do
 		local ok, mp = pcall(function() return AssetService:CreateMeshPartAsync("rbxassetid://" .. id) end)
 		if not ok or not mp then return nil end
 		mp.Size = size
-		mp.TextureID = SKIN_ID
+		mp.TextureID = UI.skinId
 		mp.Color = WHITE
 		mp.Material = Enum.Material.SmoothPlastic
 		mp.CanCollide, mp.CanQuery, mp.CanTouch, mp.Massless, mp.Anchored = false, false, false, true, false
@@ -2548,8 +2702,36 @@ do
 		end)
 	end
 
+	function UI.buildArmMesh()                       -- the 3D arm on your screen wears the skin too
+		if not UI.opt.skin then UI.buildArm() return end
+		task.spawn(function()
+			local p = newMesh(6814397494, Vector3.new(0.7, 2, 0.55))
+			if p then UI.buildArm(p) else UI.buildArm() end
+		end)
+	end
+
+	function UI.setSkin(text)                        -- a skin image id / link typed in the settings
+		local num = tostring(text or ""):match("%d+")
+		if not num then return false end
+		local url = "rbxassetid://" .. num
+		task.spawn(function()
+			pcall(function()                         -- a Decal id is not an Image id: ask Roblox for the real image
+				local o = game:GetObjects(url)[1]
+				if o then
+					if (o:IsA("Decal") or o:IsA("Texture")) and o.Texture ~= "" then url = o.Texture end
+					o:Destroy()
+				end
+			end)
+			UI.skinId = url
+			UI.buildSteve()
+			UI.buildArmMesh()
+		end)
+		return true
+	end
+
 	on(player.CharacterAdded, function() task.wait(1.2) UI.buildSteve() end)
 	UI.buildSteve()
+	UI.buildArmMesh()
 end
 
 --====================================================================
@@ -2595,14 +2777,117 @@ do
 end
 
 --====================================================================
+-- DEATH SCREEN (like Minecraft): "You Died!", Respawn, Settings (the "Title Screen" button opens the settings)
+--====================================================================
+do
+	local dead = new("Frame", {Name = "DeathScreen", Size = UDim2.fromScale(1, 1), BackgroundColor3 = WHITE, BackgroundTransparency = 0.2,
+		BorderSizePixel = 0, ZIndex = 28, Visible = false, Active = true}, gui)
+	new("UIGradient", {Color = ColorSequence.new(C(205, 120, 120), C(115, 30, 30)), Rotation = 90}, dead)
+	local inner = new("Frame", {AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.5), Size = UDim2.fromOffset(320, 250),
+		BackgroundTransparency = 1, ZIndex = 29}, dead)
+	local sc = new("UIScale", {}, inner)
+
+	local function label(text, y, size, h)
+		local l = new("TextLabel", {Position = UDim2.fromOffset(0, y), Size = UDim2.fromOffset(320, h), BackgroundTransparency = 1, Text = text,
+			TextColor3 = WHITE, TextSize = size, TextStrokeTransparency = 0.4, RichText = true, ZIndex = 30}, inner)
+		pixelFont(l)
+		return l
+	end
+	label("You Died!", 20, 26, 36)
+	local who = label("", 76, 12, 16)
+	local score = label("", 100, 12, 16)
+
+	local function mcBtn(text, y, fn)
+		local b = new("TextButton", {Position = UDim2.fromOffset(0, y), Size = UDim2.fromOffset(320, 36), BackgroundColor3 = C(130, 130, 130),
+			BorderSizePixel = 0, Text = text, TextColor3 = WHITE, TextSize = 12, AutoButtonColor = false, ZIndex = 30}, inner)
+		pixelFont(b)
+		new("UIStroke", {Color = Color3.new(0, 0, 0), Thickness = 2, ApplyStrokeMode = Enum.ApplyStrokeMode.Border}, b)
+		bevel(b, C(190, 190, 190), C(70, 70, 70), 2)
+		on(b.MouseEnter, function() b.BackgroundColor3 = C(105, 115, 175) end)
+		on(b.MouseLeave, function() b.BackgroundColor3 = C(130, 130, 130) end)
+		on(b.Activated, fn)
+		return b
+	end
+	local respawnBtn = mcBtn("Respawn", 150, function()
+		local ch = player.Character
+		local hum = ch and ch:FindFirstChildOfClass("Humanoid")
+		if hum and hum.Health > 0 then UI.hideDeath() else UI.respawnBtn.Text = "Respawning..." end   -- Roblox respawns you by itself
+	end)
+	UI.respawnBtn = respawnBtn
+	mcBtn("Settings", 196, function() UI.openOptions() end)
+
+	function UI.showDeath()
+		if UI.dead then return end
+		UI.dead = true
+		stopBreak()
+		UI.setPanel(false)
+		UI.setCraft(false)
+		UI.setMenu(false)
+		UI.closeContainer()
+		local v = Workspace.CurrentCamera.ViewportSize
+		sc.Scale = math.min(1, v.Y / 290, v.X / 340)
+		who.Text = player.DisplayName .. " was killed"
+		score.Text = 'Score: <font color="rgb(255,255,85)">' .. UI.broken .. '</font>'
+		respawnBtn.Text = "Respawn"
+		dead.Visible = true
+		UI.sync()
+	end
+
+	function UI.hideDeath()
+		if not UI.dead then return end
+		UI.dead = false
+		dead.Visible = false
+		UI.sync()
+	end
+
+	local function watch(ch)
+		local hum = ch:WaitForChild("Humanoid", 10)
+		if hum then on(hum.Died, function() UI.showDeath() end) end
+	end
+	if player.Character then task.spawn(watch, player.Character) end
+	on(player.CharacterAdded, function(ch)
+		UI.hideDeath()                                -- new body = back in the game
+		task.spawn(watch, ch)
+	end)
+end
+
+--====================================================================
 -- FLY (creative): press jump, then press jump again within 0.5 s = fly on / off.
 -- Hold jump = up, hold sneak = down. (No chat messages.)
 --====================================================================
 do
 	local last, jumpDown = 0, false
 	UI.flying = false
+
+	-- while flying: the same walk / run animation as on the ground when you move, idle when you hover (not the falling pose)
+	local flyTracks, flyCur, flyAnimator = {}, nil, nil
+	local function flyPlay(name)
+		if name == flyCur then return end
+		local hum = MV.hum
+		local animator = hum and hum:FindFirstChildOfClass("Animator")
+		if animator ~= flyAnimator then
+			for _, t in pairs(flyTracks) do pcall(function() t:Stop(0) end) end
+			flyTracks, flyAnimator, flyCur = {}, animator, nil
+		end
+		if flyCur and flyTracks[flyCur] then flyTracks[flyCur]:Stop(0.2) end
+		flyCur = name
+		if not name or not animator then return end
+		local tr = flyTracks[name]
+		if not tr then
+			local a = Instance.new("Animation")
+			a.AnimationId = ANIMATIONS[name]
+			local ok, t = pcall(function() return animator:LoadAnimation(a) end)
+			if not ok or not t then flyCur = nil return end
+			t.Priority, t.Looped = Enum.AnimationPriority.Action, true
+			tr = t
+			flyTracks[name] = t
+		end
+		tr:Play(0.2)
+	end
+
 	function UI.setFly(on_)
 		UI.flying = on_
+		if not on_ then flyPlay(nil) end
 		UI.flyT = os.clock()
 		local hum, root = MV.hum, getRoot()
 		if on_ and hum and root then
@@ -2648,15 +2933,19 @@ do
 		end
 	end)
 	on(RS.Heartbeat, function()
-		if not UI.flying then return end
+		if not UI.flying then
+			if flyCur then flyPlay(nil) end
+			return
+		end
 		local hum, root = MV.hum, getRoot()
-		if not hum or not root or hum.Health <= 0 or mode ~= "creative" then UI.flying = false return end
+		if not hum or not root or hum.Health <= 0 or mode ~= "creative" then UI.flying = false flyPlay(nil) return end
 		local up = jumpDown
 		local down = MV.sneakHeld or MV.sneakTog
 		local speed = (MV.sprintHeld or MV.sprintTog) and 44 or 24
 		local md = hum.MoveDirection
 		local vy = (up and 1 or 0) - (down and 1 or 0)
 		root.AssemblyLinearVelocity = Vector3.new(md.X * speed, vy * speed * 0.8, md.Z * speed)
+		flyPlay(Vector3.new(md.X, 0, md.Z).Magnitude > 0.1 and (speed > 30 and "run" or "walk") or "idle")
 		if down and hum.FloorMaterial ~= Enum.Material.Air and os.clock() - (UI.flyT or 0) > 0.6 then UI.setFly(false) end   -- landed
 	end)
 end
