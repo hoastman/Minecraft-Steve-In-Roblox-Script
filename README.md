@@ -21,5 +21,5 @@ Run the following script using any standard executor or script loader in Roblox:
 
 ```lua
 loadstring(game:HttpGet("https://raw.githubusercontent.com/hoastman/Minecraft-Steve-In-Roblox-Script/refs/heads/main/Minecraft"))()
-
+```
 Also Is Working In Projects
