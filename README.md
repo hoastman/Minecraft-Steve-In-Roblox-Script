@@ -20,4 +20,4 @@ Brings Minecraft Steve into Roblox games!
 Run the following script using any standard executor or script loader in Roblox:
 
 ```lua
-loadstring(game:HttpGet("[https://raw.githubusercontent.com/hoastman/Minecraft-Steve-In-Roblox-Script/refs/heads/main/Minecraft](https://raw.githubusercontent.com/hoastman/Minecraft-Steve-In-Roblox-Script/refs/heads/main/Minecraft)"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/hoastman/Minecraft-Steve-In-Roblox-Script/refs/heads/main/Minecraft"))()
