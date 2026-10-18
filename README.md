@@ -1,4 +1,4 @@
-# Minecraft-Steve-In-Roblox-Script
+# Minecraft Steve In Roblox Script
 ⛏️ STEVE IN EVERY SINGLE GAME
 
 This script forces Minecraft Steve into EVERY single Roblox game! Replaces default player avatars with a fully rigged Steve model.
