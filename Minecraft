@@ -1,4 +1,4 @@
--- Delta Minecraft V0.28 (one script, client-side only)
+-- Delta Minecraft V0.37 (one script, client-side only)
 -- Place blocks on any part of the game. Per-face textures, fixed (world-aligned) blocks,
 -- creative menu with 7 top + 7 bottom tabs, hotbar in every tab, dropped items in survival.
 local Players = game:GetService("Players")
@@ -11,7 +11,7 @@ local GuiService = game:GetService("GuiService")
 local player = Players.LocalPlayer
 local env = (getgenv and getgenv()) or _G
 
-local BLOCK, REACH = 4, 45
+local BLOCK, REACH = 2.75, 32     -- BLOCK = size of one block in studs (same scale as the Steve model: Steve is ~2 blocks tall)
 local HOTBAR_IMAGE = "rbxassetid://468654285"
 local BAR_W, BAR_H, SLOT_PITCH, ITEM_OFFSET, ITEM_SIZE, SEL_OFFSET = 364, 44, 40, 6, 32, -2
 local C = Color3.fromRGB
@@ -67,6 +67,8 @@ local ANIMATIONS = {
 }
 
 local function applyAnimations(character)
+	local hum = character:WaitForChild("Humanoid", 5)
+	if not hum or hum.RigType ~= Enum.HumanoidRigType.R15 then return end   -- these animations are R15 only: R6 keeps its normal ones
 	local animateScript = character:WaitForChild("Animate", 5)
 	if not animateScript then return end
 
@@ -117,8 +119,18 @@ end
 
 local function register(d)
 	d.Color = d.Color or C(163, 162, 165)
+	local old = BY_NAME[d.Name]
+	if old and old.Tab ~= d.Tab then
+		d.Dup = true                      -- the same block listed in ANOTHER tab: it shows in that tab, but Search shows it only once
+	else
+		if old then                       -- the same block redefined in the same tab = it replaces the old one
+			for i, x in ipairs(ITEMS) do
+				if x == old then table.remove(ITEMS, i) break end
+			end
+		end
+		BY_NAME[d.Name] = d
+	end
 	ITEMS[#ITEMS + 1] = d
-	BY_NAME[d.Name] = d
 end
 local function Block(d)
 	d.Texture, d.IsBlock = expand(d.Texture or {}), true
@@ -174,6 +186,11 @@ for _, base in ipairs({"Stone", "Cobblestone", "Oak Planks", "Bricks"}) do addSh
 -- fences + gates: placed in the MIDDLE of the block; the gate opens / closes instantly
 Fence{Name = "Oak Fence", Tab = "Building Blocks", Color = C(190, 145, 80), Material = Enum.Material.Wood, Base = "Oak Planks",
 	Texture = {All = "rbxassetid://7388983206"}}
+-- liquids + fire (you can walk into them; Lava / Fire hurt you in survival; Flint and Steel lights a Fire block)
+Block{Name = "Water", Tab = "Natural Blocks", Color = C(45, 100, 230), Transparency = 0.45, Liquid = "Water"}
+Block{Name = "Lava", Tab = "Natural Blocks", Color = C(255, 110, 15), Material = Enum.Material.Neon, Liquid = "Lava"}
+Block{Name = "Fire", Tab = "Natural Blocks", Color = C(255, 150, 20), Material = Enum.Material.Neon, Liquid = "Fire"}
+Item{Name = "Flint and Steel", Tab = "Tools & Utilities", Color = C(70, 70, 80), Front = "16783982012", Stack = 1}
 FenceGate{Name = "Oak Fence Gate", Tab = "Building Blocks", Color = C(190, 145, 80), Material = Enum.Material.Wood, Base = "Oak Planks",
 	Texture = {All = "rbxassetid://7388983206"}}
 
@@ -214,7 +231,8 @@ Block{Name = "Bookshelf", Tab = "Functional Blocks", Color = C(130, 95, 55), Mat
 	Texture = {All = "rbxassetid://7388983206", Side = "rbxassetid://74480058575656"}}
 
 -- ---- Redstone ----
-Block{Name = "Redstone Block", Tab = "Redstone", Color = C(170, 20, 20)}
+Block{Name = "Redstone Block", Tab = "Redstone", Color = C(170, 20, 20),
+	Texture = {All = "rbxassetid://8677288274"}}
 Block{Name = "Redstone Lamp", Tab = "Redstone", Color = C(215, 165, 85), Material = Enum.Material.Glass}
 Block{Name = "TNT", Tab = "Redstone", Color = C(205, 55, 45),
 	Texture = {TopBottom = "rbxassetid://5522034026", Side = "rbxassetid://5522032314"}}
@@ -230,14 +248,6 @@ Item{Name = "Diamond Shovel", Tab = "Tools & Utilities", Color = C(70, 200, 200)
 Item{Name = "Bucket", Tab = "Tools & Utilities", Color = C(175, 175, 180), Front = "", Stack = 16}
 Item{Name = "Compass", Tab = "Tools & Utilities", Color = C(150, 150, 155), Front = ""}
 Item{Name = "Shears", Tab = "Tools & Utilities", Color = C(200, 200, 205), Front = "", Stack = 1}
-
--- ---- Combat ----
-Item{Name = "Iron Sword", Tab = "Combat", Color = C(200, 200, 205), Front = "", Stack = 1}
-Item{Name = "Netherite Sword", Tab = "Combat", Color = C(70, 60, 65), Front = "17301350875", Stack = 1}
-Item{Name = "Bow", Tab = "Combat", Color = C(150, 105, 55), Front = "", Stack = 1}
-Item{Name = "Arrow", Tab = "Combat", Color = C(185, 185, 185), Front = ""}
-Item{Name = "Shield", Tab = "Combat", Color = C(140, 100, 60), Front = "", Stack = 1}
-Item{Name = "Iron Helmet", Tab = "Combat", Color = C(190, 190, 195), Front = "", Stack = 1}
 
 -- ---- Food & Drinks ----
 Item{Name = "Apple", Tab = "Food & Drinks", Color = C(200, 40, 40), Front = "", Food = 4}
@@ -266,9 +276,11 @@ Item{Name = "Pig Spawn Egg", Tab = "Spawn Eggs", Color = C(240, 160, 170), Front
 Item{Name = "Cow Spawn Egg", Tab = "Spawn Eggs", Color = C(100, 70, 50), Front = ""}
 
 -- ---- Operator Utilities ----
-Block{Name = "Command Block", Tab = "Operator Utilities", Color = C(190, 120, 60)}
+Block{Name = "Command Block", Tab = "Operator Utilities", Color = C(190, 120, 60),
+	Texture = {All = "rbxassetid://13989901645"}}
 Block{Name = "Structure Block", Tab = "Operator Utilities", Color = C(70, 60, 90)}
-Block{Name = "Barrier", Tab = "Operator Utilities", Color = C(220, 50, 50), Transparency = 0.5}
+Block{Name = "Barrier", Tab = "Operator Utilities", Color = C(220, 50, 50),
+	Texture = {All = "rbxassetid://112281900041174"}}
 Item{Name = "Debug Stick", Tab = "Operator Utilities", Color = C(130, 190, 220), Front = "", Stack = 1}
 
 --====================================================================
@@ -284,7 +296,7 @@ Item{Name = "Debug Stick", Tab = "Operator Utilities", Color = C(130, 190, 220),
 --   3) Paste it between the quotes below (you can add several links)
 --====================================================================
 local PASTEBIN_URLS = {
-	"",
+	"https://raw.githubusercontent.com/hoastman/Minecraft-Steve-In-Roblox-Script/refs/heads/main/Creative/Tab/Combat",
 }
 for _, url in ipairs(PASTEBIN_URLS) do
 	if url ~= "" then
@@ -384,7 +396,7 @@ end
 
 -- shared little table (keeps the script under Roblox's 200-locals limit)
 local UI = {persp = 0, placed = 0, broken = 0, bobT = 0, bobA = 0,
-	opt = {outline = true, hc = false, cross = true, chatBg = 0.5, chatSize = 16, chatShow = true, acc = true, hideBody = false, bob = true, takeOne = true, sneakHold = false, steve = true, skin = true, layer2 = false},
+	opt = {outline = true, hc = false, cross = true, chatBg = 0.5, chatSize = 16, chatShow = true, acc = true, hideBody = false, bob = true, takeOne = true, sneakHold = true, steve = true, skin = true, layer2 = false},
 	heldDir = Vector3.new(-1, 0.8, -1.25)}   -- heldDir = the angle you see the held block from (tweak it!)
 function UI.look()                                  -- the way you really look (even in F5 front view)
 	local cf = (UI.mirrored and UI.origCF) or Workspace.CurrentCamera.CFrame
@@ -430,11 +442,26 @@ end
 
 -- slab = 1 flat box, stairs = 2 boxes (a Model). Textures are TILED so the half-height sides are cropped, not squashed.
 -- cf = centre of the block's cell. flip = upside-down (top half). Stairs go up toward local +Z.
-local function buildShape(d, S, cf, parent, flip)
+local function buildShape(d, S, cf, parent, flip, corner)
 	local h = S / 2
 	local function box(size, off, name, par)
+		local plain = d.Shape == "Door" or d.Shape == "Fence" or d.Shape == "FenceGate"      -- plain material: no Roblox wood grain under the texture
+		if d.Shape == "Door" and not (parent and parent:IsA("ViewportFrame")) then
+			-- the door itself is invisible (Transparency 1) and its picture sits on SurfaceGuis, so empty pixels (windows) are really see-through
+			local dp = new("Part", {Name = name, Size = size, CFrame = cf * CFrame.new(off), Anchored = true, Color = d.Color,
+				Material = Enum.Material.SmoothPlastic, Transparency = 1, TopSurface = Enum.SurfaceType.Smooth, BottomSurface = Enum.SurfaceType.Smooth}, nil)
+			for face, id in pairs(d.Texture) do
+				local big = face == "Front" or face == "Back"
+				local sg = new("SurfaceGui", {Face = FACE[face], SizingMode = Enum.SurfaceGuiSizingMode.FixedSize, LightInfluence = 0,
+					CanvasSize = big and Vector2.new(128, 256) or ((face == "Top" or face == "Bottom") and Vector2.new(128, 32) or Vector2.new(32, 256))}, dp)
+				new("ImageLabel", {Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, Image = id, ImageColor3 = d.Tint or WHITE,
+					ResampleMode = Enum.ResamplerMode.Pixelated}, sg)
+			end
+			dp.Parent = par
+			return dp
+		end
 		local p = new("Part", {Name = name, Size = size, CFrame = cf * CFrame.new(off), Anchored = true, Color = d.Color,
-			Material = d.Material or Enum.Material.SmoothPlastic, Transparency = d.Clear and 1 or d.Transparency or 0,
+			Material = plain and Enum.Material.SmoothPlastic or d.Material or Enum.Material.SmoothPlastic, Transparency = d.Clear and 1 or d.Transparency or 0,
 			TopSurface = Enum.SurfaceType.Smooth, BottomSurface = Enum.SurfaceType.Smooth}, nil)
 		for face, id in pairs(d.Texture) do
 			new("Texture", {Texture = id, Face = FACE[face], StudsPerTileU = S, StudsPerTileV = (d.Shape == "Door" and (face == "Front" or face == "Back")) and S * 2 or S,
@@ -480,7 +507,14 @@ local function buildShape(d, S, cf, parent, flip)
 	end
 	local m = new("Model", {Name = "Stairs"}, nil)
 	box(Vector3.new(S, h, S), Vector3.new(0, y, 0), "Base", m)
-	box(Vector3.new(S, h, h), Vector3.new(0, -y, h / 2), "Step", m)
+	if corner and corner.kind == "outer" then          -- outer corner: only a quarter of the top is high
+		box(Vector3.new(h, h, h), Vector3.new(corner.side * h / 2, -y, h / 2), "Step", m)
+	else
+		box(Vector3.new(S, h, h), Vector3.new(0, -y, h / 2), "Step", m)
+		if corner and corner.kind == "inner" then      -- inner corner: an extra quarter makes the L shape
+			box(Vector3.new(h, h, h), Vector3.new(corner.side * h / 2, -y, -h / 2), "Step2", m)
+		end
+	end
 	m.WorldPivot = cf
 	m.Parent = parent
 	return m
@@ -494,11 +528,58 @@ local function blockRoot(inst)
 	end
 end
 
+-- STAIR CORNERS (same rules as Minecraft): a stair next to a stair that faces sideways turns into an inner / outer corner.
+function UI.rootAt(pos)                                 -- the block that sits in this grid cell
+	for _, c in ipairs(folder:GetChildren()) do
+		local cell = c:GetAttribute("Cell")
+		if cell and (cell - pos).Magnitude < 0.5 then return c end
+	end
+end
+local function stairFacing(p, flip)                      -- the facing of a stair in cell p (same half), or nil
+	local r = UI.rootAt(p)
+	local d = r and BY_NAME[r:GetAttribute("BlockType") or ""]
+	if d and d.Shape == "Stairs" and (r:GetAttribute("Flip") and true or false) == flip then return r:GetAttribute("Face") or Vector3.zAxis end
+end
+local function perp(a, b) return math.abs(a:Dot(b)) < 0.1 end
+function UI.stairCorner(pos, face, flip)
+	flip = flip and true or false
+	local right = CFrame.lookAt(pos, pos - face).RightVector
+	local back = stairFacing(pos + face * BLOCK, flip)             -- the stair behind (on the high side)
+	if back and perp(back, face) then
+		local o = stairFacing(pos - back * BLOCK, flip)
+		if not (o and (o - face).Magnitude < 0.1) then return {kind = "outer", side = back:Dot(right) > 0 and 1 or -1} end
+	end
+	local front = stairFacing(pos - face * BLOCK, flip)            -- the stair in front (low side)
+	if front and perp(front, face) then
+		local o = stairFacing(pos + front * BLOCK, flip)
+		if not (o and (o - face).Magnitude < 0.1) then return {kind = "inner", side = front:Dot(right) > 0 and 1 or -1} end
+	end
+end
+local function cornerKey(c) return c and (c.kind .. c.side) or "" end
+function UI.refreshStairs(pos, except)                  -- stairs next to this cell may change shape
+	for _, off in ipairs({Vector3.new(BLOCK, 0, 0), Vector3.new(-BLOCK, 0, 0), Vector3.new(0, 0, BLOCK), Vector3.new(0, 0, -BLOCK)}) do
+		local r = UI.rootAt(pos + off)
+		local d = r and r ~= except and BY_NAME[r:GetAttribute("BlockType") or ""]
+		if d and d.Shape == "Stairs" then
+			local cell, face, flip = r:GetAttribute("Cell"), r:GetAttribute("Face") or Vector3.zAxis, r:GetAttribute("Flip") and true or false
+			local c = UI.stairCorner(cell, face, flip)
+			if cornerKey(c) ~= (r:GetAttribute("Corner") or "") then
+				local nr = buildShape(d, BLOCK, CFrame.lookAt(cell, cell - face), folder, flip, c)
+				nr:SetAttribute("BlockType", d.Name) nr:SetAttribute("Cell", cell) nr:SetAttribute("Flip", flip)
+				nr:SetAttribute("Face", face) nr:SetAttribute("Corner", cornerKey(c))
+				r:Destroy()
+			end
+		end
+	end
+end
+
 local function makeBlock(pos, def, n, r, flip, face)
 	local root
+	local corner
 	if def.Shape then
 		local cf = face and CFrame.lookAt(pos, pos - face) or CFrame.new(pos)
-		root = buildShape(def, BLOCK, cf, folder, flip)
+		if def.Shape == "Stairs" then corner = UI.stairCorner(pos, face or Vector3.zAxis, flip) end
+		root = buildShape(def, BLOCK, cf, folder, flip, corner)
 	else
 		root = new("Part", {Size = Vector3.new(BLOCK, BLOCK, BLOCK), CFrame = blockCFrame(pos, def, n, r), Anchored = true,
 			Color = def.Color, Material = def.Material or Enum.Material.SmoothPlastic, Transparency = def.Clear and 1 or def.Transparency or 0,
@@ -510,6 +591,19 @@ local function makeBlock(pos, def, n, r, flip, face)
 	root:SetAttribute("BlockType", def.Name)
 	root:SetAttribute("Cell", pos)                 -- the grid cell it sits in (slabs only fill half of it)
 	root:SetAttribute("Flip", flip and true or false)
+	if def.Shape == "Stairs" then
+		root:SetAttribute("Face", face or Vector3.zAxis)
+		root:SetAttribute("Corner", cornerKey(corner))
+		UI.refreshStairs(pos, root)                      -- the stairs around it may turn into corners
+	end
+	if def.Liquid then                                   -- Water / Lava / Fire: no collision, you walk into them
+		root.CanCollide = false
+		if def.Liquid == "Fire" then
+			root.Transparency = 1
+			new("Fire", {Size = 7, Heat = 8, Color = C(255, 150, 20), SecondaryColor = C(200, 40, 0)}, root)
+			task.delay(30, function() if root.Parent then root:Destroy() end end)   -- the fire burns out
+		end
+	end
 	if def.Shape == "Door" or def.Shape == "FenceGate" then root:SetAttribute("Open", false) root:SetAttribute("Face", face or Vector3.zAxis) end
 	return root
 end
@@ -701,7 +795,7 @@ function render(i)
 		if d then h.btn.BackgroundColor3 = d.Color end
 		h.cnt.Visible = d ~= nil and mode == "survival" and s.count > 1
 		if d then h.cnt.Text = tostring(s.count) end
-		if i == 35 + selected and updateHand then updateHand() end
+		if (i == 35 + selected or i == 45) and updateHand then updateHand() end
 	end
 end
 
@@ -710,7 +804,8 @@ end
 --====================================================================
 local SKIN, SKIN_DARK, SLEEVE = C(214, 158, 118), C(176, 122, 86), C(58, 112, 170)
 local HAND_POS = UDim2.new(1, 0, 1, 30)
-local handBob = new("Frame", {Name = "HandBob", Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, Active = false, ZIndex = 1}, gui)
+UI.handGui = new("ScreenGui", {Name = "LocalMCHand", ResetOnSpawn = false, IgnoreGuiInset = true, DisplayOrder = -10}, guiParent())   -- its own layer BEHIND every gui
+local handBob = new("Frame", {Name = "HandBob", Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, Active = false, ZIndex = 1}, UI.handGui)
 local handRoot = new("Frame", {Name = "Hand", AnchorPoint = Vector2.new(1, 1), Position = HAND_POS, Size = UDim2.new(0.36, 0, 0.72, 0),
 	BackgroundTransparency = 1, Active = false, ZIndex = 1}, handBob)
 local handScale = new("UIScale", {}, handRoot)
@@ -748,12 +843,23 @@ end
 UI.buildArm()
 -- where the item in your hand sits, and how big it is (relative to the hand area). Change these two to move / resize it.
 UI.HELD_POS, UI.HELD_SIZE = UDim2.new(0.7, 0, 0.7, 0), UDim2.new(1, 0, 1, 0)
+-- tools / items (sword, pickaxe...): where they sit, how big, and how they are turned (degrees; -90 = blade points up-left like Minecraft)
+UI.TOOL_POS, UI.TOOL_SIZE, UI.TOOL_ROT = UDim2.new(0.74, 0, 0.78, 0), UDim2.new(0.75, 0, 0.75, 0), -90
+-- the item in your OFF hand (inventory slot "O", e.g. a shield): bottom left of the screen
+UI.OFF_POS, UI.OFF_SIZE, UI.OFF_ROT = UDim2.new(0.12, 0, 0.94, 0), UDim2.new(0.4, 0, 0.4, 0), 6
 local held = new("Frame", {AnchorPoint = Vector2.new(0.5, 0.5), Position = UI.HELD_POS, Size = UI.HELD_SIZE,
 	BorderSizePixel = 0, Visible = false, Rotation = 8, ZIndex = 4}, handRoot)
 new("UIAspectRatioConstraint", {AspectRatio = 1}, held)     -- stays square, so tools are never stretched wide
 local heldIc = mkIcon(held, 5, "held")
 local heldLbl = new("TextLabel", {Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, Font = Enum.Font.GothamBold, TextSize = 10,
 	TextWrapped = true, TextColor3 = WHITE, TextStrokeTransparency = 0.3, Text = "", ZIndex = 6}, held)
+
+UI.offF = new("Frame", {AnchorPoint = Vector2.new(0.5, 0.5), Position = UI.OFF_POS, Size = UI.OFF_SIZE, BorderSizePixel = 0,
+	Visible = false, Rotation = UI.OFF_ROT, ZIndex = 3}, handBob)
+new("UIAspectRatioConstraint", {AspectRatio = 1}, UI.offF)
+UI.offIc = mkIcon(UI.offF, 5, "held")
+UI.offLbl = new("TextLabel", {Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, Font = Enum.Font.GothamBold, TextSize = 10,
+	TextWrapped = true, TextColor3 = WHITE, TextStrokeTransparency = 0.3, Text = "", ZIndex = 6}, UI.offF)
 
 local armIsDown
 function updateHand()
@@ -770,17 +876,27 @@ function updateHand()
 		held.BackgroundTransparency = bgT(d)
 		if d.IsBlock then                                                          -- blocks sit turned a little, like Minecraft
 			held.Rotation, held.Size, held.Position = -6, UI.HELD_SIZE, UI.HELD_POS
-		else                                                                       -- tools: big, handle in the hand, blade pointing up-right
-			held.Rotation, held.Size, held.Position = 0, UI.HELD_SIZE, UI.HELD_POS
+		else                                                                       -- tools: big, handle at the bottom right, blade up-left (like Minecraft)
+			held.Rotation, held.Size, held.Position = UI.TOOL_ROT, UI.TOOL_SIZE, UI.TOOL_POS
 		end
 		setIcon(heldIc, d)
 		heldLbl.Text = (not d.IsBlock and not iconOf(d)) and d.Name or ""
+	end
+	local o = inv[45]                                                              -- the off hand (shield...) on the left of the screen
+	local od = o and BY_NAME[o.name]
+	UI.offF.Visible = od ~= nil and UI.persp == 0
+	if od then
+		UI.offF.BackgroundColor3, UI.offF.BackgroundTransparency = od.Color, bgT(od)
+		UI.offF.Rotation = od.IsBlock and 8 or UI.OFF_ROT
+		setIcon(UI.offIc, od)
+		UI.offLbl.Text = (not od.IsBlock and not iconOf(od)) and od.Name or ""
 	end
 	if UI.hold3D then UI.hold3D() end
 end
 
 function UI.refreshHand()                       -- the arm only shows in first person, with no menu open
 	handRoot.Visible = UI.persp == 0
+	UI.offF.Visible = UI.persp == 0 and inv[45] ~= nil
 	if UI.hold3D then UI.hold3D() end
 end
 
@@ -824,13 +940,18 @@ end
 local mirror = new("Frame", {Position = UDim2.fromOffset(44, 8), Size = UDim2.fromOffset(108, 144), BackgroundColor3 = Color3.new(0, 0, 0),
 	BorderSizePixel = 0, ZIndex = 4, ClipsDescendants = true}, invView)
 local vp = new("ViewportFrame", {Size = UDim2.new(1, 10, 1, 10), Position = UDim2.fromOffset(-5, 0), BackgroundTransparency = 1, ZIndex = 5}, mirror)
-pcall(function()
-	player.Character.Archivable = true
-	local clone = player.Character:Clone()
-	clone.Parent = vp
-	local r = clone:WaitForChild("HumanoidRootPart")
-	vp.CurrentCamera = new("Camera", {CFrame = CFrame.new(r.Position + r.CFrame.LookVector * 7 + Vector3.new(0, 1, 0), r.Position)}, vp)
-end)
+UI.invVP = vp
+function UI.buildInvAvatar()                          -- your own avatar (used when the Steve model is turned off)
+	vp:ClearAllChildren()
+	pcall(function()
+		player.Character.Archivable = true
+		local clone = player.Character:Clone()
+		clone.Parent = vp
+		local r = clone:WaitForChild("HumanoidRootPart")
+		vp.CurrentCamera = new("Camera", {CFrame = CFrame.new(r.Position + r.CFrame.LookVector * 7 + Vector3.new(0, 1, 0), r.Position)}, vp)
+	end)
+end
+UI.buildInvAvatar()
 
 local craft = new("TextLabel", {Text = "Crafting", Position = UDim2.fromOffset(166, 24), Size = UDim2.fromOffset(100, 16),
 	BackgroundTransparency = 1, TextColor3 = C(64, 64, 64), TextSize = 12, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 4}, invView)
@@ -846,7 +967,7 @@ local book = new("TextButton", {Position = UDim2.fromOffset(192, 116), Size = UD
 new("UIStroke", {Color = Color3.new(0, 0, 0), Thickness = 2}, book)
 new("Frame", {Position = UDim2.fromOffset(6, 8), Size = UDim2.fromOffset(22, 18), BackgroundColor3 = C(70, 150, 70), BorderSizePixel = 0, ZIndex = 7}, book)
 new("Frame", {Position = UDim2.fromOffset(9, 11), Size = UDim2.fromOffset(16, 3), BackgroundColor3 = C(225, 235, 200), BorderSizePixel = 0, ZIndex = 8}, book)
-on(book.Activated, function() sys("Recipe book is not added yet") end)
+on(book.Activated, function() if UI.toggleBook then UI.toggleBook(1) end end)
 
 local function click(i)
 	local s = inv[i]
@@ -873,6 +994,7 @@ local function click(i)
 	render(i)
 	renderCursor()
 	if i <= 4 or (i >= 46 and i <= 55) then UI.refreshCraft() end
+	if UI.bookRefresh then UI.bookRefresh() end
 end
 
 local function makeSlot(i, x, y, label, parent, handler, sz)
@@ -1008,7 +1130,7 @@ local function buildGrid()
 	local q = search.Text:lower()
 	title.Text = tabTitle()
 	for _, d in ipairs(ITEMS) do
-		if (curTab == "Search" or d.Tab == curTab) and (q == "" or d.Name:lower():find(q, 1, true)) then
+		if ((curTab == "Search" and not d.Dup) or d.Tab == curTab) and (q == "" or d.Name:lower():find(q, 1, true)) then
 			local f = new("Frame", {BackgroundColor3 = C(139, 139, 139), BorderSizePixel = 0, ZIndex = 6}, grid)
 			bevel(f, C(55, 55, 55), WHITE, 2)
 			local b = new("TextButton", {Position = UDim2.fromOffset(2, 2), Size = UDim2.fromOffset(32, 32), BackgroundTransparency = 1, Text = "", ZIndex = 7}, f)
@@ -1195,6 +1317,7 @@ do
 		end
 		UI.refreshCraft()
 	end
+	UI.recipes = R                                   -- the recipe book reads this list
 end
 
 ---------- Crafting table GUI (right-click a Crafting Table; sneak + right-click to place a block on it) ----------
@@ -1228,7 +1351,7 @@ do
 	new("UIStroke", {Color = Color3.new(0, 0, 0), Thickness = 2}, book)
 	new("Frame", {Position = UDim2.fromOffset(6, 8), Size = UDim2.fromOffset(22, 18), BackgroundColor3 = C(70, 150, 70), BorderSizePixel = 0, ZIndex = 7}, book)
 	new("Frame", {Position = UDim2.fromOffset(9, 11), Size = UDim2.fromOffset(16, 3), BackgroundColor3 = C(225, 235, 200), BorderSizePixel = 0, ZIndex = 8}, book)
-	on(book.Activated, function() sys("Recipe book is not added yet") end)
+	on(book.Activated, function() if UI.toggleBook then UI.toggleBook(2) end end)
 
 	local x = new("TextButton", {Position = UDim2.fromOffset(310, 6), Size = UDim2.fromOffset(24, 24), BackgroundColor3 = C(198, 198, 198),
 		BorderSizePixel = 0, Text = "X", TextColor3 = C(64, 64, 64), TextSize = 11, AutoButtonColor = false, ZIndex = 6}, cwin)
@@ -1257,6 +1380,135 @@ do
 		panelOpen = win.Visible or cwin.Visible or UI.menu.Visible or UI.xst ~= nil or UI.dead == true
 		UI.modal.Visible = panelOpen
 		UI.refreshHand()
+	end
+end
+
+---------- Recipe book (the green book in the inventory and in the crafting table): tap a recipe = it fills the grid ----------
+do
+	local function ingredients(rc)                    -- what ONE craft needs, and which grid cells to fill
+		local need, cells = {}, {}
+		for r, row in ipairs(rc.rows) do
+			for c = 1, #row do
+				local name = rc.key[row:sub(c, c)]
+				if name then
+					need[name] = (need[name] or 0) + 1
+					cells[#cells + 1] = {r = r, c = c, name = name}
+				end
+			end
+		end
+		return need, cells
+	end
+	local function have(name)                         -- how many you carry (inventory + hotbar, not the crafting grid)
+		local n = 0
+		for i = 9, 44 do
+			if inv[i] and inv[i].name == name then n += inv[i].count end
+		end
+		return n
+	end
+	local function take(name)                         -- remove ONE from your inventory
+		for i = 9, 44 do
+			local st = inv[i]
+			if st and st.name == name then
+				st.count -= 1
+				if st.count <= 0 then inv[i] = nil end
+				render(i)
+				return true
+			end
+		end
+		return false
+	end
+
+	local books = {}
+	local function make(ctx, winFrame, scale, viewFrame, first, size)    -- ctx 1 = inventory (2x2), ctx 2 = crafting table (3x3)
+		local P = new("Frame", {Position = UDim2.fromOffset(-180, 0), Size = UDim2.fromOffset(172, 320), BackgroundColor3 = C(198, 198, 198),
+			BorderSizePixel = 0, ZIndex = 3, Visible = false}, winFrame)
+		bevel(P, WHITE, C(85, 85, 85), 4)
+		local head = new("TextLabel", {Text = "Recipe Book", Position = UDim2.fromOffset(10, 8), Size = UDim2.fromOffset(150, 14), BackgroundTransparency = 1,
+			TextColor3 = C(64, 64, 64), TextSize = 10, TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 5}, P)
+		pixelFont(head)
+		local list = new("ScrollingFrame", {Position = UDim2.fromOffset(8, 28), Size = UDim2.fromOffset(156, 236), BackgroundColor3 = C(139, 139, 139),
+			BorderSizePixel = 0, ScrollBarThickness = 4, CanvasSize = UDim2.fromOffset(0, 0), AutomaticCanvasSize = Enum.AutomaticSize.Y, ZIndex = 5}, P)
+		new("UIPadding", {PaddingLeft = UDim.new(0, 4), PaddingTop = UDim.new(0, 4), PaddingBottom = UDim.new(0, 4)}, list)
+		new("UIGridLayout", {CellSize = UDim2.fromOffset(32, 32), CellPadding = UDim2.fromOffset(4, 4), SortOrder = Enum.SortOrder.LayoutOrder}, list)
+		local note = new("TextLabel", {Text = "Tap a recipe to fill the grid", Position = UDim2.fromOffset(10, 270), Size = UDim2.fromOffset(152, 42),
+			BackgroundTransparency = 1, TextColor3 = C(64, 64, 64), TextSize = 8, TextWrapped = true, TextXAlignment = Enum.TextXAlignment.Left,
+			TextYAlignment = Enum.TextYAlignment.Top, ZIndex = 5}, P)
+		pixelFont(note)
+
+		local entries = {}
+		local function needText(e)
+			local t = {}
+			for name, n in pairs(e.need) do t[#t + 1] = n .. " " .. name end
+			table.sort(t)
+			return table.concat(t, ", ")
+		end
+		local function refresh()
+			for _, e in ipairs(entries) do
+				local ok = true
+				for name, n in pairs(e.need) do
+					if have(name) < n then ok = false break end
+				end
+				e.ok = ok
+				e.dim.Visible = not ok
+				e.btn.LayoutOrder = ok and 0 or 1          -- the ones you can craft come first
+			end
+		end
+		local function fill(e)
+			note.Text = e.rc.out .. ":  " .. needText(e)
+			UI.returnGrid(first, size * size)             -- empty the grid first (your items come back)
+			refresh()
+			if not e.ok then note.Text = e.rc.out .. ": you need " .. needText(e) return end
+			for _, cell in ipairs(e.cells) do
+				if take(cell.name) then
+					local idx = first + (cell.r - 1) * size + (cell.c - 1)
+					inv[idx] = {name = cell.name, count = 1}
+					render(idx)
+				end
+			end
+			UI.refreshCraft()
+			refresh()
+		end
+
+		for _, rc in ipairs(UI.recipes) do
+			local h, w = #rc.rows, #rc.rows[1]
+			local d = BY_NAME[rc.out]
+			if h <= size and w <= size and d then
+				local need, cells = ingredients(rc)
+				local b = new("TextButton", {Size = UDim2.fromOffset(32, 32), BackgroundColor3 = C(139, 139, 139), BorderSizePixel = 0, Text = "",
+					AutoButtonColor = false, ZIndex = 6}, list)
+				new("UIStroke", {Color = C(55, 55, 55), Thickness = 2, ApplyStrokeMode = Enum.ApplyStrokeMode.Border}, b)
+				local item, ic = newItemView(b, 7)
+				item.BackgroundColor3, item.BackgroundTransparency = d.Color, bgT(d)
+				setIcon(ic, d)
+				local dim = new("Frame", {Size = UDim2.fromScale(1, 1), BackgroundColor3 = C(70, 70, 70), BackgroundTransparency = 0.4,
+					BorderSizePixel = 0, ZIndex = 12}, b)
+				local e = {rc = rc, need = need, cells = cells, btn = b, dim = dim}
+				entries[#entries + 1] = e
+				on(b.Activated, function() fill(e) end)
+			end
+		end
+
+		local function set(open)
+			if open == P.Visible then return end
+			P.Visible = open
+			winFrame.Position = open and UDim2.new(0.5, 89 * scale.Scale, 0.45, 0) or UDim2.fromScale(0.5, 0.45)   -- the screen slides over, like Minecraft
+			if open then refresh() note.Text = "Tap a recipe to fill the grid" end
+		end
+		on(viewFrame:GetPropertyChangedSignal("Visible"), function() if not viewFrame.Visible then set(false) end end)   -- screen / tab closed
+		on(winFrame:GetPropertyChangedSignal("Visible"), function() if not winFrame.Visible then set(false) end end)
+		books[ctx] = {P = P, set = set, refresh = refresh}
+	end
+	make(1, win, wscale, invView, 1, 2)
+	make(2, UI.cwin, UI.cscale, UI.cwin, 46, 3)
+
+	function UI.toggleBook(ctx)
+		local b = books[ctx]
+		if b then b.set(not b.P.Visible) end
+	end
+	function UI.bookRefresh()
+		for _, b in pairs(books) do
+			if b.P.Visible then b.refresh() end
+		end
 	end
 end
 
@@ -1662,7 +1914,12 @@ do
 		pixelFont(box)
 		new("UIStroke", {Color = Color3.new(0, 0, 0), Thickness = 2, ApplyStrokeMode = Enum.ApplyStrokeMode.Border}, box)
 		local status = O.text(P, "", 156, 40)
+		local prev = new("ImageLabel", {Position = UDim2.fromOffset(366, 62), Size = UDim2.fromOffset(48, 48), BackgroundColor3 = C(20, 20, 22),
+			BorderSizePixel = 0, Image = tostring(UI.skinId), ResampleMode = Enum.ResamplerMode.Pixelated, ScaleType = Enum.ScaleType.Fit, ZIndex = 32}, P)
+		new("UIStroke", {Color = Color3.new(0, 0, 0), Thickness = 2, ApplyStrokeMode = Enum.ApplyStrokeMode.Border}, prev)
+		UI.skinPrev = prev
 		btn(P, "Apply Skin", 60, 116, 145, function()
+			task.delay(1.5, function() if UI.skinPrev then UI.skinPrev.Image = tostring(UI.skinId) end end)
 			if UI.setSkin(box.Text) then
 				status.Text = UI.opt.steve and UI.opt.skin and "Skin applied (loading...)" or "Saved. Turn ON  Steve Model + Steve Skin  to see it."
 			else
@@ -1674,7 +1931,7 @@ do
 			box.Text = ""
 			status.Text = "Back to the Steve skin."
 		end)
-		O.refresh["Custom Skin Texture"] = function() box.Text = tostring(UI.skinId):match("%d+") or "" status.Text = "" end
+		O.refresh["Custom Skin Texture"] = function() box.Text = tostring(UI.skinId):match("%d+") or "" status.Text = "" prev.Image = tostring(UI.skinId) end
 	end)
 
 	O.sub("Music & Sounds", function(P)
@@ -2087,12 +2344,22 @@ local function snap(v)
 end
 
 local function placePos(hit)
-	local n = Vector3.new(math.round(hit.Normal.X), math.round(hit.Normal.Y), math.round(hit.Normal.Z))
+	-- the face you hit: the strongest axis of the normal (a slope can no longer push the block up AND sideways)
+	local nx, ny, nz = hit.Normal.X, hit.Normal.Y, hit.Normal.Z
+	local ax, ay, az = math.abs(nx), math.abs(ny), math.abs(nz)
+	local n
+	if ay >= ax and ay >= az then n = Vector3.new(0, ny >= 0 and 1 or -1, 0)
+	elseif ax >= az then n = Vector3.new(nx >= 0 and 1 or -1, 0, 0)
+	else n = Vector3.new(0, 0, nz >= 0 and 1 or -1) end
 	local root = blockRoot(hit.Instance)
 	if root then                                     -- next to another block
 		return (root:GetAttribute("Cell") or snap(root:GetPivot().Position)) + n * BLOCK, n
 	end
-	return snap(hit.Position + n * (BLOCK / 2)), n   -- on a game part / terrain
+	local p = snap(hit.Position + n * (BLOCK / 2))   -- on a game part / terrain
+	if n.Y ~= 0 then                                 -- floor / ceiling: the block touches the surface exactly (it never floats up or sinks in)
+		p = Vector3.new(p.X, hit.Position.Y + n.Y * (BLOCK / 2), p.Z)
+	end
+	return p, n
 end
 
 --====================================================================
@@ -2101,16 +2368,28 @@ end
 --====================================================================
 local dropFolder = new("Folder", {Name = "LocalMCDrops"}, Workspace)
 local drops = {}
-local DROP_SIZE, PICKUP, MAGNET = 1.4, 5, 10
+local DROP_SIZE, PICKUP, MAGNET = 0.95, 4, 8
 local dropParams = RaycastParams.new()
 dropParams.FilterType = Enum.RaycastFilterType.Exclude
 
 local function spawnDrop(pos, def, vel, count)
-	local p = new("Part", {Size = Vector3.one * DROP_SIZE, CFrame = CFrame.new(pos), Anchored = true, CanCollide = false, CanQuery = false,
+	local ic = (not def.IsBlock) and iconOf(def)
+	local p
+	if ic then                                                      -- tools / items: a spinning flat picture of the item
+		p = new("Part", {Size = Vector3.new(DROP_SIZE * 1.7, DROP_SIZE * 1.7, 0.05), CFrame = CFrame.new(pos), Anchored = true, CanCollide = false,
+			CanQuery = false, CanTouch = false, Transparency = 1}, dropFolder)
+		for _, face in ipairs({Enum.NormalId.Front, Enum.NormalId.Back}) do
+			local sg = new("SurfaceGui", {Face = face, SizingMode = Enum.SurfaceGuiSizingMode.FixedSize, CanvasSize = Vector2.new(128, 128), LightInfluence = 0}, p)
+			new("ImageLabel", {Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, Image = ic, ResampleMode = Enum.ResamplerMode.Pixelated}, sg)
+		end
+	end
+	if not p then
+	p = new("Part", {Size = Vector3.one * DROP_SIZE, CFrame = CFrame.new(pos), Anchored = true, CanCollide = false, CanQuery = false,
 		CanTouch = false, Color = def.Color, Material = def.Material or Enum.Material.SmoothPlastic, Transparency = def.Clear and 1 or def.Transparency or 0,
 		TopSurface = Enum.SurfaceType.Smooth, BottomSurface = Enum.SurfaceType.Smooth}, dropFolder)
 	for face, id in pairs(def.Texture or {}) do
 		new("Decal", {Texture = id, Face = FACE[face], Color3 = def.Tint or WHITE, Transparency = def.Clear and 0.2 or 0}, p)
+	end
 	end
 	drops[#drops + 1] = {part = p, name = def.Name, x = pos.X, y = pos.Y, z = pos.Z, vy = vel and vel.Y or 14, vx = vel and vel.X or 0, vz = vel and vel.Z or 0,
 		count = count or 1, delay = vel and 1.3 or 0.6, born = os.clock(), spin = math.random() * 6}
@@ -2156,8 +2435,11 @@ on(RS.Heartbeat, function(dt)
 		if not remove then
 			if not d.landed then                                   -- pop up, then fall until we hit something
 				d.vy -= 70 * dt
-				d.x += d.vx * dt                                       -- thrown items fly forward while they fall
+				d.x += d.vx * dt                                       -- thrown items fly forward while they fall...
 				d.z += d.vz * dt
+				local drag = math.max(0, 1 - 2.5 * dt)                 -- ...and slow down in the air
+				d.vx *= drag
+				d.vz *= drag
 				local ny = d.y + d.vy * dt
 				if d.vy < 0 then
 					local hit = Workspace:Raycast(Vector3.new(d.x, d.y, d.z), Vector3.new(0, ny - d.y - DROP_SIZE / 2, 0), dropParams)
@@ -2199,12 +2481,12 @@ end)
 -- Block outline: look at a block and a thin box shows around it (like Minecraft).
 -- Looking at a game part / terrain while holding a block outlines the cell where the block would go.
 do
-	UI.box = new("SelectionBox", {LineThickness = 0.015, SurfaceTransparency = 1, Color3 = Color3.new(0, 0, 0)}, dropFolder)
+	UI.box = new("SelectionBox", {LineThickness = 0.01, SurfaceTransparency = 1, Color3 = Color3.new(0, 0, 0)}, dropFolder)
 	UI.ghost = new("Part", {Size = Vector3.one * BLOCK, Anchored = true, CanCollide = false, CanQuery = false, CanTouch = false,
 		Transparency = 1}, dropFolder)
 	function UI.applyOutline()
 		UI.box.Color3 = UI.opt.hc and WHITE or Color3.new(0, 0, 0)
-		UI.box.LineThickness = UI.opt.hc and 0.04 or 0.015   -- tiny outline
+		UI.box.LineThickness = UI.opt.hc and 0.03 or 0.01   -- tiny outline
 	end
 	UI.applyOutline()
 	UI.outT = 0
@@ -2306,6 +2588,21 @@ local function doAction(action, pt)   -- right click / PLACE
 	local s = inv[idx]
 	if not s then return end
 	local d = BY_NAME[s.name]
+	if clicked and clicked:GetAttribute("BlockType") == "TNT" and (d.Name == "Flint and Steel" or d.Name == "Redstone Dust" or d.Name == "Lever") then
+		swing()                                          -- TNT only explodes when lit: Flint and Steel, or a redstone item (Redstone Dust / Lever)
+		UI.igniteTNT(clicked)
+		return
+	end
+	if d.Name == "Flint and Steel" then                  -- lights a Fire block next to the block you look at
+		local fpos, fn = placePos(hit)
+		swing()
+		local blocked = false
+		for _, part in ipairs(Workspace:GetPartBoundsInBox(CFrame.new(fpos), Vector3.one * (BLOCK - 0.2))) do
+			if blockRoot(part) then blocked = true break end
+		end
+		if not blocked and BY_NAME["Fire"] then UI.redstoneCheck(fpos, BY_NAME["Fire"], makeBlock(fpos, BY_NAME["Fire"], fn, r, false, nil)) end
+		return
+	end
 	if d.IsBlock then
 		local pos, n = placePos(hit)
 		local flip, face, boxCF, boxSize = false, nil, CFrame.new(pos), Vector3.one * (BLOCK - 0.2)
@@ -2336,7 +2633,7 @@ local function doAction(action, pt)   -- right click / PLACE
 			local m = part:FindFirstAncestorOfClass("Model")
 			if m and m:FindFirstChildOfClass("Humanoid") then return end
 		end
-		makeBlock(pos, d, n, r, flip, face)
+		UI.redstoneCheck(pos, d, makeBlock(pos, d, n, r, flip, face))     -- TNT next to a Redstone Block / Fire lights up
 		UI.placed += 1
 		swing()
 		if mode == "survival" then useItem(idx) end
@@ -2413,9 +2710,107 @@ local function breakPart(part)
 	local kind, bpos = part:GetAttribute("BlockType"), part:GetAttribute("Cell") or part:GetPivot().Position
 	UI.spill(part, bpos)
 	UI.breakFX(bpos, kind and BY_NAME[kind], part:IsA("BasePart") and part.Color or nil)   -- particles
+	local wasStair = kind and BY_NAME[kind] and BY_NAME[kind].Shape == "Stairs"
 	part:Destroy()
+	if wasStair then UI.refreshStairs(bpos) end
 	UI.broken += 1
 	if mode == "survival" and kind and BY_NAME[kind] then spawnDrop(bpos, BY_NAME[kind]) end   -- drops an item
+end
+
+-- TNT: it NEVER explodes by itself or when you break it. It only goes off when it is lit by
+--   * Flint and Steel (right-click the TNT),            * a redstone item in your hand (Redstone Dust / Lever, right-click the TNT),
+--   * a Redstone Block touching it (place either one next to the other),   * Fire next to it,   * another TNT exploding nearby.
+-- Lit TNT flashes for a few seconds, then blows a hole in the blocks around it, pushes you away (hurts you in survival)
+-- and lights the TNT it reaches (chain reaction).
+local NEIGHBORS = {Vector3.xAxis, -Vector3.xAxis, Vector3.yAxis, -Vector3.yAxis, Vector3.zAxis, -Vector3.zAxis}
+
+local function blockAtCell(p)
+	for _, part in ipairs(Workspace:GetPartBoundsInBox(CFrame.new(p), Vector3.one * 0.6)) do
+		local r = blockRoot(part)
+		if r then return r end
+	end
+end
+
+function UI.igniteTNT(root, fuse)
+	if not root or not root.Parent or root:GetAttribute("Lit") then return end
+	root:SetAttribute("Lit", true)
+	local pos = root:GetAttribute("Cell") or root:GetPivot().Position
+	local flash = new("Part", {Size = Vector3.one * (BLOCK + 0.06), CFrame = CFrame.new(pos), Anchored = true, CanCollide = false, CanQuery = false,
+		CanTouch = false, Material = Enum.Material.Neon, Color = WHITE, Transparency = 1}, root)
+	task.spawn(function()
+		local total, t, nextFlip, on_ = fuse or 3.2, 0, 0, false
+		while t < total do
+			if t >= nextFlip then                              -- flashes white, faster and faster
+				on_ = not on_
+				flash.Transparency = on_ and 0.35 or 1
+				nextFlip = t + (t > total * 0.6 and 0.12 or 0.25)
+			end
+			t += RS.Heartbeat:Wait()
+		end
+		if flash.Parent then flash:Destroy() end
+		UI.explode(pos, root)
+	end)
+end
+
+function UI.explode(pos, selfRoot)
+	local R = BLOCK * 3.2                                      -- blast radius
+	local ex = new("Explosion", {Position = pos, BlastRadius = BLOCK * 2, BlastPressure = 0, DestroyJointRadiusPercent = 0,
+		ExplosionType = Enum.ExplosionType.NoCraters}, Workspace)       -- just the fireball: it pushes nothing by itself
+	task.delay(3, function() pcall(function() ex:Destroy() end) end)
+	local fx, drops = 0, 0
+	for _, b in ipairs(folder:GetChildren()) do
+		local bp = b:GetAttribute("Cell") or (b:IsA("Model") and b:GetPivot().Position) or b.Position
+		local dist = (bp - pos).Magnitude
+		if b == selfRoot then
+			b:Destroy()
+		elseif dist <= R then
+			local kind = b:GetAttribute("BlockType")
+			if kind == "TNT" then
+				UI.igniteTNT(b, 0.4 + math.random() * 0.8)    -- chain reaction: a short fuse
+			else
+				local k = dist / R
+				if k < 0.6 or math.random() > (k - 0.6) / 0.4 then   -- the middle always breaks, the edge only sometimes
+					UI.spill(b, bp)
+					if fx < 30 then fx += 1 UI.breakFX(bp, kind and BY_NAME[kind], b:IsA("BasePart") and b.Color or nil) end
+					if mode == "survival" and kind and BY_NAME[kind] and drops < 20 and math.random() < 0.25 then
+						drops += 1
+						spawnDrop(bp, BY_NAME[kind])
+					end
+					b:Destroy()
+					UI.broken += 1
+				end
+			end
+		end
+	end
+	UI.breakFX(pos, BY_NAME["TNT"])
+	local r, hum = getRoot(), MV.hum                          -- you: pushed away, hurt in survival
+	if r then
+		local off = r.Position - pos
+		local dist = off.Magnitude
+		local reach = R * 1.8
+		if dist < reach then
+			local k = 1 - dist / reach
+			local dir = dist > 0.1 and off.Unit or Vector3.yAxis
+			r.AssemblyLinearVelocity += (dir + Vector3.new(0, 0.6, 0)).Unit * (70 * k + 10)
+			if hum and mode == "survival" then hum:TakeDamage(math.floor(18 * k + 0.5)) end
+		end
+	end
+end
+
+-- placing a Redstone Block next to TNT (or TNT / Fire next to a Redstone Block / TNT) lights it
+function UI.redstoneCheck(pos, d, placed)
+	if not d or not placed then return end
+	for _, dv in ipairs(NEIGHBORS) do
+		local nb = blockAtCell(pos + dv * BLOCK)
+		if nb then
+			local bt = nb:GetAttribute("BlockType")
+			if (d.Name == "Redstone Block" or d.Name == "Fire") and bt == "TNT" then
+				UI.igniteTNT(nb)
+			elseif d.Name == "TNT" and (bt == "Redstone Block" or bt == "Fire") then
+				UI.igniteTNT(placed)
+			end
+		end
+	end
 end
 
 local function startBreak(getPt, input)
@@ -2461,41 +2856,65 @@ on(RS.Heartbeat, function(dt)
 	end
 end)
 
--- SNEAK EDGE GUARD: while sneaking on the ground you stop at the edge of a block instead of falling off (like Minecraft)
+-- SNEAK EDGE GUARD: while sneaking you cannot fall off a block's edge (like Minecraft), and you can LEAN OUT over it:
+-- you stay up while ANY part of your body is over ground, so your head / camera hangs past the edge and looks down the side.
 local edgeParams = RaycastParams.new()
 edgeParams.FilterType = Enum.RaycastFilterType.Exclude
 edgeParams.IgnoreWater = true
 pcall(function() edgeParams.RespectCanCollide = true end)
-function UI.edgeGuard(hum)
-	local root = getRoot()
-	if not root then return end
-	if hum.FloorMaterial == Enum.Material.Air then return end
-	edgeParams.FilterDescendantsInstances = {player.Character, dropFolder, UI.ghost}
+-- A thin invisible ledge (UI.sneakPad) follows your feet while you sneak, so the part of your body that hangs over the edge
+-- still has floor under it and you do not slip off. It is only there while you sneak.
+pcall(function() RS:UnbindFromRenderStep("MCSneakEdge") end)
+RS:BindToRenderStep("MCSneakEdge", Enum.RenderPriority.Input.Value + 1, function(dt)
+	local sneaking = (MV.sneakHeld or MV.sneakTog) and not UI.flying
+	local pad = UI.sneakPad
+	if not sneaking then                                          -- not sneaking: the ledge is gone (you fall like normal)
+		if pad and pad.CanCollide then pad.CanCollide = false end
+		UI.sneakY = nil
+		return
+	end
+	local hum, root = MV.hum, getRoot()
+	if not hum or not root or hum.Health <= 0 then return end
+	if not pad or not pad.Parent then
+		pad = new("Part", {Name = "MCSneakPad", Size = Vector3.new(2, 0.4, 2), Anchored = true, CanCollide = false, CanQuery = false,
+			CanTouch = false, Transparency = 1}, Workspace)
+		UI.sneakPad = pad
+	end
+	edgeParams.FilterDescendantsInstances = {player.Character, dropFolder, pad, UI.ghost}
 	local pos = root.Position
-	local drop = root.Size.Y / 2 + hum.HipHeight + 2.4          -- how far down we look for ground (a small step is fine, a block-high drop is not)
-	local function solid(dir, d)
-		return Workspace:Raycast(pos + dir * d, Vector3.new(0, -drop, 0), edgeParams) ~= nil
+	local near = Workspace:Raycast(pos, Vector3.new(0, -4.5, 0), edgeParams)   -- the ground you stand on
+	if near then
+		UI.sneakY, UI.sneakAir = near.Position.Y, 0
+	elseif hum.FloorMaterial == Enum.Material.Air then            -- really in the air (jump / fall): forget the ledge
+		UI.sneakAir = (UI.sneakAir or 0) + dt
+		if UI.sneakAir > 0.4 then UI.sneakY = nil end
 	end
-	-- remember the last spot that is safely inside a block (ground on all 4 sides)
-	if solid(Vector3.xAxis, 0.9) and solid(-Vector3.xAxis, 0.9) and solid(Vector3.zAxis, 0.9) and solid(-Vector3.zAxis, 0.9) then
-		MV.safe = pos
+	if UI.sneakY then                                             -- keep the little ledge under your feet at ground height
+		pad.CFrame = CFrame.new(pos.X, UI.sneakY - 0.2, pos.Z)
+		pad.CanCollide = true
+	else
+		pad.CanCollide = false
 	end
+
 	local md = hum.MoveDirection
 	local flat = Vector3.new(md.X, 0, md.Z)
-	if flat.Magnitude < 0.1 then return end
-	local dir = flat.Unit
-	if solid(dir, 1.6) then return end                           -- ground ahead: walk normally
-	local slide                                                  -- no ground ahead: slide along the edge if one axis is still safe
-	local ax, az = Vector3.new(dir.X, 0, 0), Vector3.new(0, 0, dir.Z)
-	if math.abs(ax.X) > 0.2 and solid(ax.Unit, 1.6) then slide = ax
-	elseif math.abs(az.Z) > 0.2 and solid(az.Unit, 1.6) then slide = az end
-	local v, sp = root.AssemblyLinearVelocity, hum.WalkSpeed
-	root.AssemblyLinearVelocity = Vector3.new(slide and slide.X * sp or 0, v.Y, slide and slide.Z * sp or 0)
-	-- hard stop: if we crept too close to the edge anyway, put us back on the last safe spot
-	if MV.safe and not solid(dir, 0.9) then
-		root.CFrame = root.CFrame + Vector3.new(MV.safe.X - pos.X, 0, MV.safe.Z - pos.Z)
+	if not UI.sneakY or flat.Magnitude < 0.05 then return end
+	local floorY = UI.sneakY
+	local function ground(p)                                      -- ground under this spot, at most ~1.5 studs lower than where you stand
+		return Workspace:Raycast(Vector3.new(p.X, floorY + 1.8, p.Z), Vector3.new(0, -3.4, 0), edgeParams) ~= nil
 	end
-end
+	local HALF = 1.4                                              -- like Minecraft: you stay up while ANY part of your body is over ground
+	local function supported(p)
+		return ground(p) or ground(p + Vector3.new(HALF, 0, HALF)) or ground(p + Vector3.new(-HALF, 0, HALF))
+			or ground(p + Vector3.new(HALF, 0, -HALF)) or ground(p + Vector3.new(-HALF, 0, -HALF))
+	end
+	local step = flat.Unit * (0.45 + hum.WalkSpeed * dt * 2)       -- a little ahead of where you are about to be
+	if supported(pos + step) then return end                      -- still over ground: walk normally (you can lean out past the edge)
+	local out = Vector3.zero                                      -- nothing under you ahead: keep only the part that is safe (slide along the edge)
+	if math.abs(step.X) > 0.05 and supported(pos + Vector3.new(step.X, 0, 0)) then out += Vector3.new(md.X, 0, 0) end
+	if math.abs(step.Z) > 0.05 and supported(pos + Vector3.new(0, 0, step.Z)) then out += Vector3.new(0, 0, md.Z) end
+	hum:Move(out, false)
+end)
 
 -- SPRINT: hold Shift (phone: SPRINT button).   SNEAK: hold Ctrl or C (phone: SNEAK button) = slow + lower camera.
 on(RS.Heartbeat, function(dt)
@@ -2516,7 +2935,6 @@ on(RS.Heartbeat, function(dt)
 	elseif MV.base then
 		hum.WalkSpeed, MV.base = MV.base, nil
 	end
-	if sneak then UI.edgeGuard(hum) end
 	local k = math.min(1, dt * 12)
 	if sneak or math.abs(MV.camY) > 0.01 then
 		local nxt = MV.camY + ((sneak and -1 or 0) - MV.camY) * k
@@ -2529,6 +2947,54 @@ on(RS.Heartbeat, function(dt)
 		MV.fov = nxt
 	end
 end)
+
+-- SNEAK POSE: your body hunches over like in Minecraft (R6 and R15). Built by bending the body joints, so it needs no animation id.
+do
+	local joints, jhum, blend, restored = nil, nil, 0, true
+	local function rot(base, ang, pivot)               -- turn a joint around the X axis (side to side), around its own point
+		local p = pivot or base.Position
+		return CFrame.new(p) * CFrame.Angles(ang, 0, 0) * CFrame.new(-p) * base
+	end
+	local function scan(ch, hum)
+		local j = {}
+		local function add(name, kind)
+			local m = ch:FindFirstChild(name, true)
+			if m and m:IsA("Motor6D") then j[#j + 1] = {m = m, base = m.C0, kind = kind} end
+		end
+		if hum.RigType == Enum.HumanoidRigType.R15 then
+			add("Waist", "waist") add("RightHip", "hip") add("LeftHip", "hip") add("RightKnee", "knee") add("LeftKnee", "knee") add("Root", "root")
+		else
+			add("RootJoint", "r6root") add("Right Hip", "r6hip") add("Left Hip", "r6hip")
+		end
+		return j
+	end
+	on(RS.RenderStepped, function(dt)
+		local hum, ch = MV.hum, player.Character
+		if not hum or not ch or hum.Health <= 0 then return end
+		local want = ((MV.sneakHeld or MV.sneakTog) and not UI.flying and #(UI.poseParts or {}) == 0) and 1 or 0
+		if hum ~= jhum or (joints and joints[1] and not joints[1].m.Parent) then joints, jhum, blend, restored = nil, hum, 0, true end
+		if want == 0 and restored then return end
+		if not joints then joints = scan(ch, hum) end
+		blend += (want - blend) * math.min(1, dt * 10)
+		if want == 0 and blend < 0.01 then                          -- back to normal: give every joint its original place
+			for _, j in ipairs(joints) do if j.m.Parent then j.m.C0 = j.base end end
+			blend, restored = 0, true
+			return
+		end
+		restored = false
+		for _, j in ipairs(joints) do
+			if j.m.Parent then
+				local k = j.kind
+				if k == "waist" then j.m.C0 = rot(j.base, -0.38 * blend)                              -- lean forward
+				elseif k == "hip" then j.m.C0 = rot(j.base, 0.32 * blend)                             -- thighs forward
+				elseif k == "knee" then j.m.C0 = rot(j.base, -0.65 * blend)                           -- knees bent
+				elseif k == "root" then j.m.C0 = CFrame.new(0, -0.22 * blend, 0) * j.base            -- body a bit lower
+				elseif k == "r6root" then j.m.C0 = rot(j.base, -0.38 * blend, Vector3.new(0, -1, 0))   -- torso leans forward from the hips
+				elseif k == "r6hip" then j.m.C0 = rot(j.base, 0.38 * blend) end                       -- legs stay straight under you
+			end
+		end
+	end)
+end
 
 -- the arm bobs while you walk (faster when sprinting, slower when sneaking) and breathes when you stand still
 on(RS.RenderStepped, function(dt)
@@ -2551,29 +3017,100 @@ end)
 local function center() return Workspace.CurrentCamera.ViewportSize / 2 end
 
 if UIS.TouchEnabled then
-	local brkBtn = roundButton("BREAK", 50, C(200, 60, 60))
-	on(brkBtn.InputBegan, function(input) if isPress(input) then startBreak(center, input) end end)   -- hold it
-	on(roundButton("PLACE", -50, C(60, 160, 80)).Activated, function() doAction("Place", center()) end)
+	-- Minecraft Pocket Edition style: square see-through buttons with a dark outline and a drawn icon
+	local DARK, BASE, LIT = C(35, 45, 35), C(170, 185, 165), C(240, 200, 80)
+	local function mcBtn(x, y, size)
+		local b = new("TextButton", {AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, x, 0.5, y), Size = UDim2.fromOffset(size or 66, size or 66),
+			BackgroundColor3 = BASE, BackgroundTransparency = 0.45, Text = "", AutoButtonColor = false, ZIndex = 5}, gui)
+		new("UICorner", {CornerRadius = UDim.new(0, 8)}, b)
+		new("UIStroke", {Color = DARK, Thickness = 2.5, Transparency = 0.15}, b)
+		return b
+	end
+	local function bar(parent, w, h, x, y, rot)          -- one rectangle of an icon, centered at x, y from the middle of the button
+		new("Frame", {AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, x, 0.5, y), Size = UDim2.fromOffset(w, h), Rotation = rot or 0,
+			BackgroundColor3 = DARK, BorderSizePixel = 0, ZIndex = 6}, parent)
+	end
+	local function arrow(b, down)                         -- arrow up / down with a line under it
+		local m = down and -1 or 1
+		bar(b, 6, 22, 0, 2 * m, 0)
+		bar(b, 6, 16, -5, -7 * m, 45 * m)
+		bar(b, 6, 16, 5, -7 * m, -45 * m)
+		bar(b, 24, 4, 0, 18, 0)
+	end
+	local function sprintIcon(b)                          -- >>
+		for _, ox in ipairs({-7, 5}) do
+			bar(b, 5, 14, ox, -5, -45)
+			bar(b, 5, 14, ox, 5, 45)
+		end
+	end
+	local function swordIcon(b)
+		bar(b, 5, 28, 4, -4, 45)                          -- blade
+		bar(b, 16, 4, -5, 5, -45)                         -- guard
+		bar(b, 5, 9, -10, 10, 45)                         -- grip
+	end
+	local function handIcon(b)
+		bar(b, 17, 13, 0, 7, 0)                           -- palm
+		for _, fx in ipairs({-6, -2, 2, 6}) do bar(b, 3, 11, fx, -3, 0) end   -- fingers
+		bar(b, 4, 10, -11, 5, -35)                        -- thumb
+	end
 
-	local sprintBtn = roundButton("SPRINT", -50, C(70, 110, 200), -116, 64)
-	local sneakBtn = roundButton("SNEAK", 50, C(110, 110, 120), -116, 64)
+	local upBtn = mcBtn(-20, -112)                        -- jump / fly up
+	local downBtn = mcBtn(-20, -34)                       -- sneak / fly down
+	local handBtn = mcBtn(-20, 44)                        -- place / use
+	local swordBtn = mcBtn(-96, 6)                        -- break
+	local sprintBtn = mcBtn(-96, -66, 54)                 -- sprint
+	arrow(upBtn, false) arrow(downBtn, true) handIcon(handBtn) swordIcon(swordBtn) sprintIcon(sprintBtn)
+
+	on(swordBtn.InputBegan, function(input) if isPress(input) then startBreak(center, input) end end)   -- hold it
+	on(handBtn.Activated, function() doAction("Place", center()) end)
+
+	local function lit(b, on_) b.BackgroundColor3 = on_ and LIT or BASE b.BackgroundTransparency = on_ and 0.25 or 0.45 end
 	local function refreshBtns()
-		sprintBtn.BackgroundColor3 = MV.sprintTog and C(240, 170, 40) or C(70, 110, 200)
-		sneakBtn.BackgroundColor3 = MV.sneakTog and C(240, 170, 40) or C(110, 110, 120)
+		lit(sprintBtn, MV.sprintTog)
+		lit(downBtn, MV.sneakTog)
 	end
 	MV.refresh = refreshBtns
 	on(sprintBtn.Activated, function() MV.sprintTog = not MV.sprintTog MV.sneakTog = false refreshBtns() end)
-	on(sneakBtn.Activated, function()
+	on(downBtn.Activated, function()
 		if UI.opt.sneakHold then return end                                   -- hold mode: handled below
 		MV.sneakTog = not MV.sneakTog MV.sprintTog = false refreshBtns()
 	end)
 	local function tapType(i) return i.UserInputType == Enum.UserInputType.Touch or i.UserInputType == Enum.UserInputType.MouseButton1 end
-	on(sneakBtn.InputBegan, function(i)
+	on(downBtn.InputBegan, function(i)
 		if UI.opt.sneakHold and tapType(i) then MV.sneakTog, MV.sprintTog = true, false refreshBtns() end   -- sneak while you hold it
 	end)
-	on(sneakBtn.InputEnded, function(i)
+	on(downBtn.InputEnded, function(i)
 		if UI.opt.sneakHold and tapType(i) then MV.sneakTog = false refreshBtns() end
 	end)
+
+	-- the up arrow = jump (hold = keep jumping / fly up; jump twice = fly). The round Roblox jump button is hidden.
+	UI.jumpHeld = false
+	on(upBtn.InputBegan, function(i)
+		if tapType(i) then UI.jumpHeld = true if UI.jumpInput then UI.jumpInput(true) end end
+	end)
+	on(upBtn.InputEnded, function(i)
+		if tapType(i) then UI.jumpHeld = false if UI.jumpInput then UI.jumpInput(false) end end
+	end)
+	on(RS.Heartbeat, function()
+		local hum = MV.hum
+		if UI.jumpHeld and hum and not UI.flying then hum.Jump = true end
+	end)
+	task.spawn(function()
+		local pg, t0 = player:WaitForChild("PlayerGui"), os.clock()
+		repeat
+			local tg = pg:FindFirstChild("TouchGui")
+			local fr = tg and tg:FindFirstChild("TouchControlFrame")
+			UI.rjump = fr and fr:FindFirstChild("JumpButton")
+			if not UI.rjump then task.wait(0.5) end
+		until UI.rjump or os.clock() - t0 > 20
+		if UI.rjump then
+			UI.rjump.Visible = false
+			on(UI.rjump:GetPropertyChangedSignal("Visible"), function() if UI.rjump.Visible then UI.rjump.Visible = false end end)
+		end
+	end)
+	function UI.showJump()
+		if UI.rjump then pcall(function() UI.rjump.Visible = true end) end
+	end
 end
 
 --====================================================================
@@ -2596,7 +3133,10 @@ do
 	}
 	local ORDER = {"Torso", "Head", "RightArm", "LeftArm", "RightLeg", "LeftLeg"}
 
+	UI.poseParts = {}
 	function UI.unsteve()
+		UI.steveNeck = nil
+		UI.poseParts, UI.steveTorso = {}, nil
 		if UI.steveF then pcall(function() UI.steveF:Destroy() end) UI.steveF = nil end
 	end
 
@@ -2613,11 +3153,13 @@ do
 	end
 
 	-- puts a Steve part in place and welds it to the body part it follows
-	local function attach(host, part, cf, folder)
+	local function attach(host, part, cf, folder, key)
 		part:SetAttribute("Steve", true)
 		part.CFrame = cf
 		part.Parent = folder
-		new("WeldConstraint", {Part0 = host, Part1 = part}, part)
+		local rel = host.CFrame:ToObjectSpace(cf)
+		local w = new("Weld", {Part0 = host, Part1 = part, C0 = rel}, part)       -- a Weld (not WeldConstraint): the pose below moves it
+		UI.poseParts[#UI.poseParts + 1] = {weld = w, host = host, rel = rel, key = key or "Torso"}
 	end
 
 	function UI.buildSteve()
@@ -2625,7 +3167,7 @@ do
 		local tok = UI.steveTok
 		UI.unsteve()
 		local ch = player.Character
-		if not UI.opt.steve or not ch then return end
+		if not UI.opt.steve or not ch then UI.buildInvSteve() return end
 		local f = new("Folder", {Name = "SteveModel"}, ch)
 		UI.steveF = f
 		local function live() return tok == UI.steveTok and f.Parent ~= nil end
@@ -2647,6 +3189,7 @@ do
 			end
 			local torso = ch:FindFirstChild("UpperTorso") or ch:FindFirstChild("Torso")
 			if not live() or not torso then return end
+			UI.steveTorso = torso
 
 			-- step 2 (instant, no waiting): place every part where the body is RIGHT NOW and weld it
 			for _, key in ipairs(ORDER) do
@@ -2664,12 +3207,27 @@ do
 					end
 
 					local mm = meshes[key]
-					if mm and mm.base then
+					if mm and mm.base and key == "Head" then
+						-- the visible head hangs on its OWN neck joint, so it turns with the camera on any rig (R6 / R15)
+						mm.base.Name = "SteveHead"
+						mm.base:SetAttribute("Steve", true)
+						mm.base.CFrame = base
+						mm.base.Parent = f
+						UI.steveNeck = new("Motor6D", {Name = "SteveNeck", Part0 = torso, Part1 = mm.base,
+							C0 = CFrame.new(0, torso.Size.Y / 2, 0), C1 = CFrame.new(0, -size.Y / 2, 0)}, mm.base)
+						if mm.layer then               -- hat / hair layer follows the head
+							mm.layer.Name = "Layer2Head"
+							mm.layer:SetAttribute("Steve", true)
+							mm.layer.CFrame = base
+							mm.layer.Parent = f
+							new("WeldConstraint", {Part0 = mm.base, Part1 = mm.layer}, mm.layer)
+						end
+					elseif mm and mm.base then
 						mm.base.Name = "Steve" .. key
-						attach(host, mm.base, base, f)
+						attach(host, mm.base, base, f, key)
 						if mm.layer then               -- second layer (jacket / sleeves / pants / hat)
 							mm.layer.Name = "Layer2" .. key
-							attach(host, mm.layer, base, f)
+							attach(host, mm.layer, base, f, key)
 						end
 					else
 						-- fallback: simple colored boxes
@@ -2677,7 +3235,7 @@ do
 							local part = new("Part", {Name = name, Size = sz, Color = col, Material = Enum.Material.SmoothPlastic, CanCollide = false,
 								CanQuery = false, CanTouch = false, Massless = true, Anchored = false, TopSurface = Enum.SurfaceType.Smooth,
 								BottomSurface = Enum.SurfaceType.Smooth}, nil)
-							attach(host, part, cf, f)
+							attach(host, part, cf, f, key)
 						end
 						local function at(x, y, z) return base * CFrame.new(x, y, z) end
 						mk("Steve" .. key, size, m[3], base)
@@ -2699,6 +3257,40 @@ do
 				end
 			end
 			UI.applySkin()
+			UI.buildInvSteve()
+			UI.heldKey = nil
+			if UI.hold3D then UI.hold3D() end
+		end)
+	end
+
+	-- Steve standing in the inventory screen (his own pose, wearing the skin)
+	function UI.buildInvSteve()
+		local vpf = UI.invVP
+		if not vpf then return end
+		if not UI.opt.steve then UI.buildInvAvatar() return end
+		vpf:ClearAllChildren()
+		vpf.Ambient, vpf.LightColor = C(170, 170, 170), WHITE
+		vpf.CurrentCamera = new("Camera", {FieldOfView = 38, CFrame = CFrame.lookAt(Vector3.new(0, 0.5, -9.5), Vector3.new(0, -0.4, 0))}, vpf)
+		local model = new("Model", {Name = "InvSteve"}, vpf)
+		model.WorldPivot = CFrame.new()
+		task.spawn(function()
+			local T, H = MESH.Torso[2], MESH.Head[2]
+			local armX, legY = T.X / 2 + MESH.RightArm[2].X / 2, T.Y / 2 + MESH.RightLeg[2].Y / 2
+			local POS = {Torso = Vector3.zero, Head = Vector3.new(0, T.Y / 2 + H.Y / 2, 0),
+				RightArm = Vector3.new(armX, 0, 0), LeftArm = Vector3.new(-armX, 0, 0),
+				RightLeg = Vector3.new(0.343, -legY, 0), LeftLeg = Vector3.new(-0.343, -legY, 0)}
+			local function put(name, id, size, col, pos)
+				local mp = UI.opt.skin and id and newMesh(id, size) or nil
+				if not mp then mp = new("Part", {Size = size, Color = col, Material = Enum.Material.SmoothPlastic}, nil) end
+				mp.Name, mp.Anchored, mp.CFrame = name, true, CFrame.new(pos)
+				mp.Parent = model
+			end
+			for _, key in ipairs(ORDER) do
+				local m = MESH[key]
+				put("Inv" .. key, m[1], m[2], m[3], POS[key])
+				if UI.opt.skin and UI.opt.layer2 then put("InvLayer" .. key, m[6], m[7], m[3], POS[key]) end
+			end
+			model:PivotTo(CFrame.Angles(0, math.rad(-25), 0))        -- turned a little, like the Minecraft inventory
 		end)
 	end
 
@@ -2746,14 +3338,37 @@ do
 		if motor and motor.Parent and motor:IsDescendantOf(ch) then return end
 		motor, torsoPart, c0 = nil, nil, nil
 		local m = ch:FindFirstChild("Neck", true)
-		if m and m:IsA("Motor6D") and m.Part0 then motor, torsoPart, c0 = m, m.Part0, m.C0 end
+		if not (m and m:IsA("Motor6D")) then              -- another name: the joint that holds the head
+			m = nil
+			for _, o in ipairs(ch:GetDescendants()) do
+				if o:IsA("Motor6D") and o.Part1 and o.Part1.Name == "Head" then m = o break end
+			end
+		end
+		if m and m.Part0 then
+			motor, torsoPart, c0 = m, m.Part0, m.C0
+			print("Head look: neck found (" .. m.Name .. ", " .. m.Part0.Name .. " -> Head)")
+		else
+			if UI.neckWarned ~= ch then UI.neckWarned = ch print("Head look: NO neck joint found") end
+		end
 	end
+	function UI.headApply()
+		if motor and motor.Parent and c0 then
+			motor.C0 = CFrame.new(c0.Position) * CFrame.Angles(0, yaw, 0) * CFrame.Angles(pitch, 0, 0) * (c0 - c0.Position)
+		end
+		local sn = UI.steveNeck                                      -- the Steve head's own neck
+		if sn and sn.Parent and sn.Part0 then
+			sn.C0 = (UI.leanL or CFrame.identity) * CFrame.new(0, sn.Part0.Size.Y / 2, 0) * CFrame.Angles(0, yaw, 0) * CFrame.Angles(pitch, 0, 0)
+		end
+	end
+	on(RS.Heartbeat, function() UI.headApply() end)         -- (set again after the animations ran, so nothing can undo it)
 	function UI.resetHead()
 		if motor and motor.Parent and c0 then motor.C0 = c0 end
 	end
 	on(RS.RenderStepped, function(dt)
 		find()
-		if not motor then return end
+		local sn = UI.steveNeck
+		local tpart = torsoPart or (sn and sn.Part0)
+		if (not motor and not (sn and sn.Parent)) or not tpart then return end
 		local look = UI.look()
 		local root = getRoot()
 		local hum = MV.hum
@@ -2766,14 +3381,56 @@ do
 				root.CFrame = root.CFrame * CFrame.Angles(0, dy, 0)
 			end
 		end
-		local lv = torsoPart.CFrame:VectorToObjectSpace(look)              -- the camera direction as seen from your body
+		local lv = tpart.CFrame:VectorToObjectSpace(look)              -- the camera direction as seen from your body
 		local ty = math.clamp(math.atan2(-lv.X, -lv.Z), -math.rad(80), math.rad(80))
 		local tp = math.clamp(math.asin(math.clamp(lv.Y, -1, 1)), -math.rad(70), math.rad(70))
 		local a = math.min(1, dt * 18)
 		yaw += (ty - yaw) * a
 		pitch += (tp - pitch) * a
-		motor.C0 = CFrame.new(c0.Position) * CFrame.Angles(0, yaw, 0) * CFrame.Angles(pitch, 0, 0) * (c0 - c0.Position)
+		UI.headApply()
 	end)
+end
+
+--====================================================================
+-- STEVE POSE: sneaking leans your body forward and the right arm swings (R6 + R15).
+-- It moves the welds that hold the Steve model, so it does not depend on the rig's own joints.
+--====================================================================
+do
+	local lean = 0
+	UI.swingA, UI.leanL, UI.holdA = 0, CFrame.identity, 0     -- holdA = how far the right arm is raised while you hold something
+	local function apply()
+		local list, torso = UI.poseParts, UI.steveTorso
+		if not list or #list == 0 or not torso or not torso.Parent then return end
+		local hipP = CFrame.new(0, -torso.Size.Y / 2, 0)
+		local L = hipP * CFrame.Angles(-lean, 0, 0) * hipP:Inverse()            -- lean forward around the hips, in the torso's space
+		UI.leanL = L
+		local tcf = torso.CFrame
+		local lw = tcf * L * tcf:Inverse()                                       -- the same lean in world space
+		for _, p in ipairs(list) do
+			if p.weld.Parent and p.host.Parent then
+				local hcf = p.host.CFrame
+				if p.key == "RightLeg" or p.key == "LeftLeg" then
+					p.weld.C0 = p.rel                                            -- legs stay under you
+				else
+					local S = CFrame.identity
+					if p.key == "RightArm" and (UI.swingA ~= 0 or UI.holdA > 0.01) then   -- raise the arm (holding) + swing it forward around the shoulder
+						local hy = p.host.Size.Y / 2
+						S = CFrame.new(0, hy, 0) * CFrame.Angles(UI.swingA + UI.holdA, 0, 0) * CFrame.new(0, -hy, 0)
+					end
+					p.weld.C0 = hcf:ToObjectSpace(lw * hcf * S * p.rel)
+				end
+			end
+		end
+	end
+	on(RS.RenderStepped, function(dt)
+		local sneaking = (MV.sneakHeld or MV.sneakTog) and not UI.flying
+		lean += ((sneaking and 0.42 or 0) - lean) * math.min(1, dt * 10)
+		local st = inv[35 + selected]
+		local hd = st and BY_NAME[st.name]
+		UI.holdA += (((hd and UI.persp ~= 0) and (hd.IsBlock and 0.35 or 0.55) or 0) - UI.holdA) * math.min(1, dt * 12)
+		apply()
+	end)
+	on(RS.Heartbeat, apply)
 end
 
 --====================================================================
@@ -2852,18 +3509,77 @@ do
 end
 
 --====================================================================
+-- WATER / LAVA / FIRE: swim in water + lava (slow, jump = up), lava and fire burn you in survival
+--====================================================================
+do
+	local params = OverlapParams.new()
+	params.FilterType = Enum.RaycastFilterType.Include
+	params.FilterDescendantsInstances = {folder}
+	local RANK = {Water = 1, Fire = 2, Lava = 3}
+	local t, hurtT, burnUntil, flame = 0, 0, 0, nil
+	UI.inLiquid = nil
+	on(RS.Heartbeat, function(dt)
+		local root, hum = getRoot(), MV.hum
+		if not root or not hum or hum.Health <= 0 then return end
+		t += dt
+		if t >= 0.08 then                                      -- look around you 12 times a second
+			t = 0
+			local found
+			for _, p in ipairs(Workspace:GetPartBoundsInBox(root.CFrame, Vector3.new(1.6, 4, 1.6), params)) do
+				local def = BY_NAME[p:GetAttribute("BlockType") or ""]
+				if def and def.Liquid and (not found or RANK[def.Liquid] > RANK[found]) then found = def.Liquid end
+			end
+			UI.inLiquid = found
+		end
+		local liquid = UI.inLiquid
+		if liquid and liquid ~= "Fire" and not UI.flying then   -- swimming: slow, sink gently, jump = swim up
+			local v = root.AssemblyLinearVelocity
+			local k = math.max(0, 1 - 6 * dt)
+			local up = hum.Jump or UIS:IsKeyDown(Enum.KeyCode.Space)
+			root.AssemblyLinearVelocity = Vector3.new(v.X * k, up and 9 or math.max(v.Y, -3), v.Z * k)
+		end
+		local now = os.clock()
+		if liquid == "Lava" or liquid == "Fire" then
+			if mode == "survival" then
+				burnUntil = now + (liquid == "Lava" and 6 or 3)
+				hurtT += dt
+				if hurtT >= 0.5 then hurtT = 0 hum:TakeDamage(liquid == "Lava" and 4 or 1) end
+			end
+		end
+		if now < burnUntil and mode == "survival" then          -- burning: flames on you for a few seconds
+			if not flame or not flame.Parent then flame = new("Fire", {Size = 5, Heat = 6}, root) end
+		elseif flame then
+			flame:Destroy()
+			flame = nil
+		end
+	end)
+end
+
+--====================================================================
 -- FLY (creative): press jump, then press jump again within 0.5 s = fly on / off.
 -- Hold jump = up, hold sneak = down. (No chat messages.)
 --====================================================================
 do
 	local last, jumpDown = 0, false
+	local flyAt, flyVF                                -- a small upward force that cancels gravity while you fly
 	UI.flying = false
 
 	-- while flying: the same walk / run animation as on the ground when you move, idle when you hover (not the falling pose)
 	local flyTracks, flyCur, flyAnimator = {}, nil, nil
-	local function flyPlay(name)
-		if name == flyCur then return end
+	local function flyId(name)                        -- R15: your custom animations.  R6: the walk / run animation R6 already has
 		local hum = MV.hum
+		if hum and hum.RigType == Enum.HumanoidRigType.R6 then
+			local an = player.Character and player.Character:FindFirstChild("Animate")
+			local f = an and an:FindFirstChild(name == "run" and "run" or "walk")
+			local a = f and f:FindFirstChildOfClass("Animation")
+			return a and a.AnimationId or "http://www.roblox.com/asset/?id=180426354"
+		end
+		return ANIMATIONS[name]
+	end
+	local function flyPlay(name)
+		local hum = MV.hum
+		if name == "idle" and hum and hum.RigType == Enum.HumanoidRigType.R6 then name = "walk" end   -- R6: hovering = the same animation as moving
+		if name == flyCur then return end
 		local animator = hum and hum:FindFirstChildOfClass("Animator")
 		if animator ~= flyAnimator then
 			for _, t in pairs(flyTracks) do pcall(function() t:Stop(0) end) end
@@ -2875,7 +3591,7 @@ do
 		local tr = flyTracks[name]
 		if not tr then
 			local a = Instance.new("Animation")
-			a.AnimationId = ANIMATIONS[name]
+			a.AnimationId = flyId(name)
 			local ok, t = pcall(function() return animator:LoadAnimation(a) end)
 			if not ok or not t then flyCur = nil return end
 			t.Priority, t.Looped = Enum.AnimationPriority.Action, true
@@ -2898,12 +3614,16 @@ do
 	local function pressed()                              -- ONE finger / key press (holding does not count twice)
 		if mode ~= "creative" or panelOpen or chatOpen then return end
 		local now = os.clock()
-		if now - last < 0.5 then
+		if now - last < 0.3 then                          -- two quick presses = fly (slow jumping taps no longer start flying)
 			last = 0
 			UI.setFly(not UI.flying)                      -- same double press turns it on AND off
 		else
 			last = now
 		end
+	end
+	function UI.jumpInput(isDown)                           -- the on-screen up arrow (phone)
+		jumpDown = isDown
+		if isDown then pressed() end
 	end
 	on(UIS.InputBegan, function(i)
 		if i.KeyCode == Enum.KeyCode.Space and not UIS:GetFocusedTextBox() then jumpDown = true pressed() end
@@ -2935,10 +3655,20 @@ do
 	on(RS.Heartbeat, function()
 		if not UI.flying then
 			if flyCur then flyPlay(nil) end
+			if flyVF then flyVF:Destroy() flyVF = nil end
+			if flyAt then flyAt:Destroy() flyAt = nil end
 			return
 		end
 		local hum, root = MV.hum, getRoot()
 		if not hum or not root or hum.Health <= 0 or mode ~= "creative" then UI.flying = false flyPlay(nil) return end
+		if not flyVF or flyVF.Parent ~= root then          -- gravity is cancelled, so you HOVER where you stop (no more slow falling)
+			if flyVF then flyVF:Destroy() end
+			if flyAt then flyAt:Destroy() end
+			flyAt = new("Attachment", {Name = "MCFlyAt"}, root)
+			flyVF = new("VectorForce", {Name = "MCFlyForce", Attachment0 = flyAt, RelativeTo = Enum.ActuatorRelativeTo.World,
+				ApplyAtCenterOfMass = true, Force = Vector3.zero}, root)
+		end
+		flyVF.Force = Vector3.new(0, root.AssemblyMass * Workspace.Gravity, 0)
 		local up = jumpDown
 		local down = MV.sneakHeld or MV.sneakTog
 		local speed = (MV.sprintHeld or MV.sprintTog) and 44 or 24
@@ -2946,7 +3676,7 @@ do
 		local vy = (up and 1 or 0) - (down and 1 or 0)
 		root.AssemblyLinearVelocity = Vector3.new(md.X * speed, vy * speed * 0.8, md.Z * speed)
 		flyPlay(Vector3.new(md.X, 0, md.Z).Magnitude > 0.1 and (speed > 30 and "run" or "walk") or "idle")
-		if down and hum.FloorMaterial ~= Enum.Material.Air and os.clock() - (UI.flyT or 0) > 0.6 then UI.setFly(false) end   -- landed
+		if not up and hum.FloorMaterial ~= Enum.Material.Air and os.clock() - (UI.flyT or 0) > 0.6 then UI.setFly(false) end   -- you landed: flying stops and jumping works again
 	end)
 end
 
@@ -2955,23 +3685,47 @@ end
 --====================================================================
 do
 	local busy = false
-	function UI.swing3D()
+	function UI.swing3D()                              -- works on R6 (Right Shoulder) and R15 (RightShoulder + RightElbow)
 		if busy then return end
+		if UI.poseParts and #UI.poseParts > 0 then      -- the Steve arm swings (the pose below reads UI.swingA)
+			busy = true
+			task.spawn(function()
+				local t0 = os.clock()
+				while true do
+					local k = (os.clock() - t0) / 0.28
+					if k >= 1 then break end
+					UI.swingA = math.sin(k * math.pi) * 1.9
+					RS.RenderStepped:Wait()
+				end
+				UI.swingA = 0
+				busy = false
+			end)
+			return
+		end
 		local ch = player.Character
-		local m = ch and (ch:FindFirstChild("RightShoulder", true) or ch:FindFirstChild("Right Shoulder", true))
-		if not m or not m:IsA("Motor6D") then return end
+		if not ch then return end
+		local sh = ch:FindFirstChild("RightShoulder", true) or ch:FindFirstChild("Right Shoulder", true)
+		if not sh or not sh:IsA("Motor6D") then return end
+		local el = ch:FindFirstChild("RightElbow", true)                 -- only R15 has an elbow
+		if el and not el:IsA("Motor6D") then el = nil end
 		busy = true
 		task.spawn(function()
-			local c0 = m.C0
-			local rest = c0 - c0.Position
+			local c0, e0 = sh.C0, el and el.C0
+			local p = c0.Position
 			local t0 = os.clock()
-			while m.Parent do
+			while sh.Parent do
 				local k = (os.clock() - t0) / 0.28
 				if k >= 1 then break end
-				m.C0 = CFrame.new(c0.Position) * CFrame.Angles(math.sin(k * math.pi) * 1.9, 0, 0) * rest
+				local sw = math.sin(k * math.pi)
+				sh.C0 = CFrame.new(p) * CFrame.Angles(sw * 1.9, 0, 0) * CFrame.new(-p) * c0       -- arm forward, around the shoulder
+				if el and el.Parent then
+					local ep = e0.Position
+					el.C0 = CFrame.new(ep) * CFrame.Angles(sw * 0.8, 0, 0) * CFrame.new(-ep) * e0   -- R15: the forearm folds a little
+				end
 				RS.RenderStepped:Wait()
 			end
-			if m.Parent then m.C0 = c0 end
+			if sh.Parent then sh.C0 = c0 end
+			if el and el.Parent then el.C0 = e0 end
 			busy = false
 		end)
 	end
@@ -2982,6 +3736,8 @@ do
 		local st = inv[35 + selected]
 		local d = st and BY_NAME[st.name]
 		local hand = ch and (ch:FindFirstChild("RightHand") or ch:FindFirstChild("Right Arm"))
+		local sa = UI.steveF and UI.steveF:FindFirstChild("SteveRightArm")
+		if sa then hand = sa end                                      -- the Steve arm moves when you swing / sneak
 		local key = (d and d.Name or "") .. "|" .. UI.persp
 		if UI.heldF and UI.heldF.Parent and UI.heldKey == key and UI.heldHand == hand then return end
 		if UI.heldF then pcall(function() UI.heldF:Destroy() end) UI.heldF = nil end
@@ -2991,16 +3747,27 @@ do
 		UI.heldF = f
 		local part, off
 		local ic = (not d.IsBlock) and iconOf(d)
-		local fy = hand.Name == "RightHand" and -0.3 or -0.8
+		local fy = hand.Name == "RightHand" and -0.3 or (hand.Name == "SteveRightArm" and -0.75 or -0.8)
 		local flags = {CanCollide = false, CanQuery = false, CanTouch = false, Massless = true, Anchored = false}
+		if d.IsBlock and d.Shape then                                -- door / slab / stairs / fence / gate: the real shape
+			local m = buildShape(d, d.Shape == "Door" and 1 or 1.3, hand.CFrame * CFrame.new(0, fy - (d.Shape == "Door" and 0.5 or 0), -0.9), f, false)
+			for _, o in ipairs(m:IsA("BasePart") and {m} or m:GetDescendants()) do
+				if o:IsA("BasePart") then
+					o.Anchored, o.CanCollide, o.CanQuery, o.CanTouch, o.Massless = false, false, false, false, true
+					o:SetAttribute("Held", true)
+					new("WeldConstraint", {Part0 = hand, Part1 = o}, o)
+				end
+			end
+			return
+		end
 		if ic then                                                   -- tools: a flat picture of the item
 			part = new("Part", flags, nil)
-			part.Size, part.Transparency = Vector3.new(1.9, 1.9, 0.05), 1
+			part.Size, part.Transparency = Vector3.new(2.4, 2.4, 0.05), 1
 			for _, face in ipairs(SIDES) do
 				local sg = new("SurfaceGui", {Face = face, SizingMode = Enum.SurfaceGuiSizingMode.FixedSize, CanvasSize = Vector2.new(160, 160), LightInfluence = 0}, part)
 				new("ImageLabel", {Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, Image = ic, ResampleMode = Enum.ResamplerMode.Pixelated}, sg)
 			end
-			off = CFrame.new(0, fy, -1) * CFrame.Angles(0, math.rad(90), math.rad(-25))
+			off = CFrame.new(0, fy, -1.1) * CFrame.Angles(0, math.rad(90), math.rad(-20))
 		else                                                         -- blocks: a small cube
 			part = new("Part", flags, nil)
 			part.Size = Vector3.one * (d.IsBlock and 1.3 or 0.8)
@@ -3095,6 +3862,8 @@ env.MCCleanup = function()
 	end)
 	pcall(function() RS:UnbindFromRenderStep("MCFrontRestore") end)
 	pcall(function() RS:UnbindFromRenderStep("MCFrontMirror") end)
+	pcall(function() RS:UnbindFromRenderStep("MCSneakEdge") end)
+	pcall(function() if UI.sneakPad then UI.sneakPad:Destroy() end end)
 	pcall(function()
 		player.CameraMinZoomDistance = UI.origMin
 		player.CameraMaxZoomDistance = UI.origMax
@@ -3105,13 +3874,21 @@ env.MCCleanup = function()
 		UI.opt.acc = true
 		UI.opt.hideBody = false
 		UI.opt.steve = false
+		if UI.showJump then UI.showJump() end
 		UI.unsteve()
 		UI.resetHead()
 		UI.flying = false
+		local fr = getRoot()                              -- remove the anti-gravity force
+		if fr then
+			for _, o in ipairs(fr:GetChildren()) do
+				if o.Name == "MCFlyForce" or o.Name == "MCFlyAt" then o:Destroy() end
+			end
+		end
 		if UI.heldF then UI.heldF:Destroy() end
 		UI.applySkin()
 	end)
 	pcall(function() gui:Destroy() end)
+	pcall(function() UI.handGui:Destroy() end)
 	pcall(function() folder:Destroy() end)
 	pcall(function() dropFolder:Destroy() end)
 	pcall(function() SG:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, true) end)
@@ -3122,4 +3899,4 @@ end
 
 modeLabel.Text = "Mode: Survival"
 sys("Welcome! Survival mode. Type gamemode creative for the creative menu, or /give Apple")
-print("Delta Minecraft V0.23 ready!")
+print("Delta Minecraft V0.34 ready!")
