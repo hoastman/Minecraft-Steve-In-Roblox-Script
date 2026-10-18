@@ -1,5 +1,5 @@
 -- Weapons
-Item{Name = "Wooden Sword", Tab = "Combat", Color = C(160, 110, 60), Front = "15881033200", Stack = 1}
+Item{Name = "Wooden Sword", Tab = "Combat", Color = C(160, 110, 60), Front = "13749331597", Stack = 1}
 Item{Name = "Stone Sword", Tab = "Combat", Color = C(128, 128, 128), Front = "130355380278363", Stack = 1}
 Item{Name = "Iron Sword", Tab = "Combat", Color = C(190, 190, 195), Front = "136472028348145", Stack = 1}
 Item{Name = "Golden Sword", Tab = "Combat", Color = C(240, 210, 60), Front = "93273090003130", Stack = 1}
@@ -12,11 +12,11 @@ Item{Name = "Iron Spear", Tab = "Combat", Color = C(190, 190, 195), Front = "", 
 Item{Name = "Golden Spear", Tab = "Combat", Color = C(240, 210, 60), Front = "", Stack = 1}
 Item{Name = "Diamond Spear", Tab = "Combat", Color = C(80, 220, 220), Front = "", Stack = 1}
 
-Item{Name = "Wooden Axe", Tab = "Combat", Color = C(160, 110, 60), Front = "", Stack = 1}
-Item{Name = "Stone Axe", Tab = "Combat", Color = C(128, 128, 128), Front = "", Stack = 1}
-Item{Name = "Iron Axe", Tab = "Combat", Color = C(190, 190, 195), Front = "", Stack = 1}
-Item{Name = "Golden Axe", Tab = "Combat", Color = C(240, 210, 60), Front = "", Stack = 1}
-Item{Name = "Diamond Axe", Tab = "Combat", Color = C(80, 220, 220), Front = "", Stack = 1}
+Item{Name = "Wooden Axe", Tab = "Combat", Color = C(160, 110, 60), Front = "130644035273341", Stack = 1}
+Item{Name = "Stone Axe", Tab = "Combat", Color = C(128, 128, 128), Front = "15683047620", Stack = 1}
+Item{Name = "Iron Axe", Tab = "Combat", Color = C(190, 190, 195), Front = "12185834555", Stack = 1}
+Item{Name = "Golden Axe", Tab = "Combat", Color = C(240, 210, 60), Front = "12524148518", Stack = 1}
+Item{Name = "Diamond Axe", Tab = "Combat", Color = C(80, 220, 220), Front = "113653000915679", Stack = 1}
 
 Item{Name = "Trident", Tab = "Combat", Color = C(70, 160, 160), Front = "", Stack = 1}
 Item{Name = "Mace", Tab = "Combat", Color = C(130, 110, 140), Front = "", Stack = 1}
