@@ -1,0 +1,158 @@
+-- Oak
+Block{Name = "Oak Log", Tab = "Natural Blocks", Color = C(105, 75, 45), Material = Enum.Material.Wood, Pillar = true, Texture = {TopBottom = "104199545247654", Side = "128754006217410"}}
+Block{Name = "Stripped Oak Log", Tab = "Building Blocks", Color = C(190, 145, 80), Texture = {TopBottom = "88999493570885", Side = "93666282207075"}}
+Block{Name = "Oak Wood", Tab = "Building Blocks", Color = C(190, 145, 80), Texture = {All = "128754006217410"}}
+Block{Name = "Stripped Oak Wood", Tab = "Building Blocks", Color = C(190, 145, 80), Texture = {All = "93666282207075"}}
+Block{Name = "Oak Planks", Tab = "Building Blocks", Color = C(190, 145, 80), Texture = {All = "rbxassetid://7388983206"}}
+Block{Name = "Oak Fence", Tab = "Building Blocks", Color = C(190, 145, 80), Texture = {All = "rbxassetid://7388983206"}}
+Block{Name = "Oak Fence Gate", Tab = "Building Blocks", Color = C(190, 145, 80), Texture = {All = "rbxassetid://7388983206"}}
+Block{Name = "Oak Pressure Plate", Tab = "Building Blocks", Color = C(190, 145, 80), Texture = {All = "rbxassetid://7388983206"}}
+Block{Name = "Oak Button", Tab = "Building Blocks", Color = C(190, 145, 80), Texture = {All = "rbxassetid://7388983206"}}
+Block{Name = "Oak Trapdoor", Tab = "Building Blocks", Color = C(190, 145, 80), Shape = "Trapdoor", Material = Enum.Material.Wood, Base = "Oak Planks", Texture = {All = ""}}
+Block{Name = "Oak Trapdoor", Tab = "Redstone", Color = C(190, 145, 80), Shape = "Trapdoor", Material = Enum.Material.Wood, Base = "Oak Planks", Texture = {All = ""}}
+Block{Name = "Oak Door", Tab = "Building Blocks", Color = C(190, 145, 80), Shape = "Door", Material = Enum.Material.Wood, Texture = {TopBottom = "rbxassetid://7388983206", Left = "rbxassetid://7388983206", Right = "rbxassetid://7388983206", Front = "rbxassetid://13478841510", Back = "rbxassetid://13478841510"}}
+
+-- Spruce
+Block{Name = "Spruce Log", Tab = "Building Blocks", Color = C(100, 70, 40), Texture = {TopBottom = "122858443704601", Side = "125281939387733"}}
+Block{Name = "Stripped Spruce Log", Tab = "Building Blocks", Color = C(100, 70, 40), Texture = {TopBottom = "", Side = "104889960384236"}}
+Block{Name = "Spruce Wood", Tab = "Building Blocks", Color = C(100, 70, 40), Texture = {All = "125281939387733"}}
+Block{Name = "Stripped Spruce Wood", Tab = "Building Blocks", Color = C(100, 70, 40), Texture = {All = "104889960384236"}}
+Block{Name = "Spruce Planks", Tab = "Building Blocks", Color = C(100, 70, 40), Texture = {All = "86919871893495"}}
+Block{Name = "Spruce Fence", Tab = "Building Blocks", Color = C(100, 70, 40), Texture = {All = "86919871893495"}}
+Block{Name = "Spruce Fence Gate", Tab = "Building Blocks", Color = C(100, 70, 40), Texture = {All = "86919871893495"}}
+Block{Name = "Spruce Pressure Plate", Tab = "Building Blocks", Color = C(100, 70, 40), Texture = {All = "86919871893495"}}
+Block{Name = "Spruce Button", Tab = "Building Blocks", Color = C(100, 70, 40), Texture = {All = "86919871893495"}}
+Block{Name = "Spruce Trapdoor", Tab = "Building Blocks", Color = C(100, 70, 40), Shape = "Trapdoor", Material = Enum.Material.Wood, Base = "Spruce Planks", Texture = {TopBottom = "13431425864"}}
+Block{Name = "Spruce Trapdoor", Tab = "Redstone", Color = C(100, 70, 40), Shape = "Trapdoor", Material = Enum.Material.Wood, Base = "Spruce Planks", Texture = {TopBottom = "13431425864"}}
+Block{Name = "Spruce Door", Tab = "Building Blocks", Color = C(100, 70, 40), Shape = "Door", Material = Enum.Material.Wood, Texture = {TopBottom = "", DoorTop = "91237916164289", DoorBottom = "134015078759249", BackTop = "91237916164289", BackBottom = "134015078759249"}}
+
+-- Birch
+Block{Name = "Birch Log", Tab = "Building Blocks", Color = C(220, 210, 170), Texture = {TopBottom = "", Side = "76927709769462"}}
+Block{Name = "Stripped Birch Log", Tab = "Building Blocks", Color = C(220, 210, 170), Texture = {TopBottom = "", Side = ""}}
+Block{Name = "Birch Wood", Tab = "Building Blocks", Color = C(220, 210, 170), Texture = {All = ""}}
+Block{Name = "Stripped Birch Wood", Tab = "Building Blocks", Color = C(220, 210, 170), Texture = {All = ""}}
+Block{Name = "Birch Planks", Tab = "Building Blocks", Color = C(220, 210, 170), Texture = {All = ""}}
+Block{Name = "Birch Fence", Tab = "Building Blocks", Color = C(220, 210, 170), Texture = {All = ""}}
+Block{Name = "Birch Fence Gate", Tab = "Building Blocks", Color = C(220, 210, 170), Texture = {All = ""}}
+Block{Name = "Birch Pressure Plate", Tab = "Building Blocks", Color = C(220, 210, 170), Texture = {All = ""}}
+Block{Name = "Birch Button", Tab = "Building Blocks", Color = C(220, 210, 170), Texture = {All = ""}}
+Block{Name = "Birch Trapdoor", Tab = "Building Blocks", Color = C(220, 210, 170), Shape = "Trapdoor", Material = Enum.Material.Wood, Base = "Birch Planks", Texture = {TopBottom = "13431425864"}}
+Block{Name = "Birch Trapdoor", Tab = "Redstone", Color = C(220, 210, 170), Shape = "Trapdoor", Material = Enum.Material.Wood, Base = "Birch Planks", Texture = {All = ""}}
+Block{Name = "Birch Door", Tab = "Building Blocks", Color = C(220, 210, 170), Shape = "Door", Material = Enum.Material.Wood, Texture = {TopBottom = "", Left = "", Right = "", Front = "", Back = ""}}
+
+-- Jungle
+Block{Name = "Jungle Log", Tab = "Building Blocks", Color = C(160, 115, 80), Texture = {TopBottom = "", Side = ""}}
+Block{Name = "Stripped Jungle Log", Tab = "Building Blocks", Color = C(160, 115, 80), Texture = {TopBottom = "", Side = ""}}
+Block{Name = "Jungle Wood", Tab = "Building Blocks", Color = C(160, 115, 80), Texture = {All = ""}}
+Block{Name = "Stripped Jungle Wood", Tab = "Building Blocks", Color = C(160, 115, 80), Texture = {All = ""}}
+Block{Name = "Jungle Planks", Tab = "Building Blocks", Color = C(160, 115, 80), Texture = {All = ""}}
+Block{Name = "Jungle Fence", Tab = "Building Blocks", Color = C(160, 115, 80), Texture = {All = ""}}
+Block{Name = "Jungle Fence Gate", Tab = "Building Blocks", Color = C(160, 115, 80), Texture = {All = ""}}
+Block{Name = "Jungle Pressure Plate", Tab = "Building Blocks", Color = C(160, 115, 80), Texture = {All = ""}}
+Block{Name = "Jungle Button", Tab = "Building Blocks", Color = C(160, 115, 80), Texture = {All = ""}}
+Block{Name = "Jungle Trapdoor", Tab = "Building Blocks", Color = C(160, 115, 80), Shape = "Trapdoor", Material = Enum.Material.Wood, Base = "Jungle Planks", Texture = {All = ""}}
+Block{Name = "Jungle Trapdoor", Tab = "Redstone", Color = C(160, 115, 80), Shape = "Trapdoor", Material = Enum.Material.Wood, Base = "Jungle Planks", Texture = {All = ""}}
+Block{Name = "Jungle Door", Tab = "Building Blocks", Color = C(160, 115, 80), Shape = "Door", Material = Enum.Material.Wood, Texture = {TopBottom = "", Left = "", Right = "", Front = "", Back = ""}}
+
+-- Acacia
+Block{Name = "Acacia Log", Tab = "Building Blocks", Color = C(180, 90, 50), Texture = {TopBottom = "", Side = ""}}
+Block{Name = "Stripped Acacia Log", Tab = "Building Blocks", Color = C(180, 90, 50), Texture = {TopBottom = "", Side = ""}}
+Block{Name = "Acacia Wood", Tab = "Building Blocks", Color = C(180, 90, 50), Texture = {All = ""}}
+Block{Name = "Stripped Acacia Wood", Tab = "Building Blocks", Color = C(180, 90, 50), Texture = {All = ""}}
+Block{Name = "Acacia Planks", Tab = "Building Blocks", Color = C(180, 90, 50), Texture = {All = ""}}
+Block{Name = "Acacia Fence", Tab = "Building Blocks", Color = C(180, 90, 50), Texture = {All = ""}}
+Block{Name = "Acacia Fence Gate", Tab = "Building Blocks", Color = C(180, 90, 50), Texture = {All = ""}}
+Block{Name = "Acacia Pressure Plate", Tab = "Building Blocks", Color = C(180, 90, 50), Texture = {All = ""}}
+Block{Name = "Acacia Button", Tab = "Building Blocks", Color = C(180, 90, 50), Texture = {All = ""}}
+Block{Name = "Acacia Trapdoor", Tab = "Building Blocks", Color = C(180, 90, 50), Shape = "Trapdoor", Material = Enum.Material.Wood, Base = "Acacia Planks", Texture = {All = ""}}
+Block{Name = "Acacia Trapdoor", Tab = "Redstone", Color = C(180, 90, 50), Shape = "Trapdoor", Material = Enum.Material.Wood, Base = "Acacia Planks", Texture = {All = ""}}
+Block{Name = "Acacia Door", Tab = "Building Blocks", Color = C(180, 90, 50), Shape = "Door", Material = Enum.Material.Wood, Texture = {TopBottom = "", Left = "", Right = "", Front = "", Back = ""}}
+
+-- Dark Oak
+Block{Name = "Dark Oak Log", Tab = "Building Blocks", Color = C(60, 40, 20), Texture = {TopBottom = "", Side = ""}}
+Block{Name = "Stripped Dark Oak Log", Tab = "Building Blocks", Color = C(60, 40, 20), Texture = {TopBottom = "", Side = ""}}
+Block{Name = "Dark Oak Wood", Tab = "Building Blocks", Color = C(60, 40, 20), Texture = {All = ""}}
+Block{Name = "Stripped Dark Oak Wood", Tab = "Building Blocks", Color = C(60, 40, 20), Texture = {All = ""}}
+Block{Name = "Dark Oak Planks", Tab = "Building Blocks", Color = C(60, 40, 20), Texture = {All = ""}}
+Block{Name = "Dark Oak Fence", Tab = "Building Blocks", Color = C(60, 40, 20), Texture = {All = ""}}
+Block{Name = "Dark Oak Fence Gate", Tab = "Building Blocks", Color = C(60, 40, 20), Texture = {All = ""}}
+Block{Name = "Dark Oak Pressure Plate", Tab = "Building Blocks", Color = C(60, 40, 20), Texture = {All = ""}}
+Block{Name = "Dark Oak Button", Tab = "Building Blocks", Color = C(60, 40, 20), Texture = {All = ""}}
+Block{Name = "Dark Oak Trapdoor", Tab = "Building Blocks", Color = C(60, 40, 20), Shape = "Trapdoor", Material = Enum.Material.Wood, Base = "Dark Oak Planks", Texture = {All = ""}}
+Block{Name = "Dark Oak Trapdoor", Tab = "Redstone", Color = C(60, 40, 20), Shape = "Trapdoor", Material = Enum.Material.Wood, Base = "Dark Oak Planks", Texture = {All = ""}}
+Block{Name = "Dark Oak Door", Tab = "Building Blocks", Color = C(60, 40, 20), Shape = "Door", Material = Enum.Material.Wood, Texture = {TopBottom = "", Left = "", Right = "", Front = "", Back = ""}}
+
+-- Mangrove
+Block{Name = "Mangrove Log", Tab = "Building Blocks", Color = C(120, 40, 40), Texture = {TopBottom = "", Side = ""}}
+Block{Name = "Stripped Mangrove Log", Tab = "Building Blocks", Color = C(120, 40, 40), Texture = {TopBottom = "", Side = ""}}
+Block{Name = "Mangrove Wood", Tab = "Building Blocks", Color = C(120, 40, 40), Texture = {All = ""}}
+Block{Name = "Stripped Mangrove Wood", Tab = "Building Blocks", Color = C(120, 40, 40), Texture = {All = ""}}
+Block{Name = "Mangrove Planks", Tab = "Building Blocks", Color = C(120, 40, 40), Texture = {All = ""}}
+Block{Name = "Mangrove Fence", Tab = "Building Blocks", Color = C(120, 40, 40), Texture = {All = ""}}
+Block{Name = "Mangrove Fence Gate", Tab = "Building Blocks", Color = C(120, 40, 40), Texture = {All = ""}}
+Block{Name = "Mangrove Pressure Plate", Tab = "Building Blocks", Color = C(120, 40, 40), Texture = {All = ""}}
+Block{Name = "Mangrove Button", Tab = "Building Blocks", Color = C(120, 40, 40), Texture = {All = ""}}
+Block{Name = "Mangrove Trapdoor", Tab = "Building Blocks", Color = C(120, 40, 40), Shape = "Trapdoor", Material = Enum.Material.Wood, Base = "Mangrove Planks", Texture = {All = ""}}
+Block{Name = "Mangrove Trapdoor", Tab = "Redstone", Color = C(120, 40, 40), Shape = "Trapdoor", Material = Enum.Material.Wood, Base = "Mangrove Planks", Texture = {All = ""}}
+Block{Name = "Mangrove Door", Tab = "Building Blocks", Color = C(120, 40, 40), Shape = "Door", Material = Enum.Material.Wood, Texture = {TopBottom = "", Left = "", Right = "", Front = "", Back = ""}}
+
+-- Cherry
+Block{Name = "Cherry Log", Tab = "Building Blocks", Color = C(230, 170, 180), Texture = {TopBottom = "", Side = ""}}
+Block{Name = "Stripped Cherry Log", Tab = "Building Blocks", Color = C(230, 170, 180), Texture = {TopBottom = "", Side = ""}}
+Block{Name = "Cherry Wood", Tab = "Building Blocks", Color = C(230, 170, 180), Texture = {All = ""}}
+Block{Name = "Stripped Cherry Wood", Tab = "Building Blocks", Color = C(230, 170, 180), Texture = {All = ""}}
+Block{Name = "Cherry Planks", Tab = "Building Blocks", Color = C(230, 170, 180), Texture = {All = ""}}
+Block{Name = "Cherry Fence", Tab = "Building Blocks", Color = C(230, 170, 180), Texture = {All = ""}}
+Block{Name = "Cherry Fence Gate", Tab = "Building Blocks", Color = C(230, 170, 180), Texture = {All = ""}}
+Block{Name = "Cherry Pressure Plate", Tab = "Building Blocks", Color = C(230, 170, 180), Texture = {All = ""}}
+Block{Name = "Cherry Button", Tab = "Building Blocks", Color = C(230, 170, 180), Texture = {All = ""}}
+Block{Name = "Cherry Trapdoor", Tab = "Building Blocks", Color = C(230, 170, 180), Shape = "Trapdoor", Material = Enum.Material.Wood, Base = "Cherry Planks", Texture = {All = ""}}
+Block{Name = "Cherry Trapdoor", Tab = "Redstone", Color = C(230, 170, 180), Shape = "Trapdoor", Material = Enum.Material.Wood, Base = "Cherry Planks", Texture = {All = ""}}
+Block{Name = "Cherry Door", Tab = "Building Blocks", Color = C(230, 170, 180), Shape = "Door", Material = Enum.Material.Wood, Texture = {TopBottom = "", Left = "", Right = "", Front = "", Back = ""}}
+
+-- Pale Oak
+Block{Name = "Pale Oak Log", Tab = "Building Blocks", Color = C(210, 205, 200), Texture = {TopBottom = "", Side = ""}}
+Block{Name = "Stripped Pale Oak Log", Tab = "Building Blocks", Color = C(210, 205, 200), Texture = {TopBottom = "", Side = ""}}
+Block{Name = "Pale Oak Wood", Tab = "Building Blocks", Color = C(210, 205, 200), Texture = {All = ""}}
+Block{Name = "Stripped Pale Oak Wood", Tab = "Building Blocks", Color = C(210, 205, 200), Texture = {All = ""}}
+Block{Name = "Pale Oak Planks", Tab = "Building Blocks", Color = C(210, 205, 200), Texture = {All = ""}}
+Block{Name = "Pale Oak Fence", Tab = "Building Blocks", Color = C(210, 205, 200), Texture = {All = ""}}
+Block{Name = "Pale Oak Fence Gate", Tab = "Building Blocks", Color = C(210, 205, 200), Texture = {All = ""}}
+Block{Name = "Pale Oak Pressure Plate", Tab = "Building Blocks", Color = C(210, 205, 200), Texture = {All = ""}}
+Block{Name = "Pale Oak Button", Tab = "Building Blocks", Color = C(210, 205, 200), Texture = {All = ""}}
+Block{Name = "Pale Oak Trapdoor", Tab = "Building Blocks", Color = C(210, 205, 200), Shape = "Trapdoor", Material = Enum.Material.Wood, Base = "Pale Oak Planks", Texture = {All = ""}}
+Block{Name = "Pale Oak Trapdoor", Tab = "Redstone", Color = C(210, 205, 200), Shape = "Trapdoor", Material = Enum.Material.Wood, Base = "Pale Oak Planks", Texture = {All = ""}}
+Block{Name = "Pale Oak Door", Tab = "Building Blocks", Color = C(210, 205, 200), Shape = "Door", Material = Enum.Material.Wood, Texture = {TopBottom = "", Left = "", Right = "", Front = "", Back = ""}}
+
+-- Crimson
+Block{Name = "Crimson Stem", Tab = "Building Blocks", Color = C(130, 50, 70), Texture = {TopBottom = "", Side = ""}}
+Block{Name = "Stripped Crimson Stem", Tab = "Building Blocks", Color = C(130, 50, 70), Texture = {TopBottom = "", Side = ""}}
+Block{Name = "Crimson Hyphae", Tab = "Building Blocks", Color = C(130, 50, 70), Texture = {All = ""}}
+Block{Name = "Stripped Crimson Hyphae", Tab = "Building Blocks", Color = C(130, 50, 70), Texture = {All = ""}}
+Block{Name = "Crimson Planks", Tab = "Building Blocks", Color = C(130, 50, 70), Texture = {All = ""}}
+Block{Name = "Crimson Fence", Tab = "Building Blocks", Color = C(130, 50, 70), Texture = {All = ""}}
+Block{Name = "Crimson Fence Gate", Tab = "Building Blocks", Color = C(130, 50, 70), Texture = {All = ""}}
+Block{Name = "Crimson Pressure Plate", Tab = "Building Blocks", Color = C(130, 50, 70), Texture = {All = ""}}
+Block{Name = "Crimson Button", Tab = "Building Blocks", Color = C(130, 50, 70), Texture = {All = ""}}
+Block{Name = "Crimson Trapdoor", Tab = "Building Blocks", Color = C(130, 50, 70), Shape = "Trapdoor", Material = Enum.Material.Wood, Base = "Crimson Planks", Texture = {All = ""}}
+Block{Name = "Crimson Trapdoor", Tab = "Redstone", Color = C(130, 50, 70), Shape = "Trapdoor", Material = Enum.Material.Wood, Base = "Crimson Planks", Texture = {All = ""}}
+Block{Name = "Crimson Door", Tab = "Building Blocks", Color = C(130, 50, 70), Shape = "Door", Material = Enum.Material.Wood, Texture = {TopBottom = "", Left = "", Right = "", Front = "", Back = ""}}
+
+-- Warped
+Block{Name = "Warped Stem", Tab = "Building Blocks", Color = C(50, 120, 120), Texture = {TopBottom = "", Side = ""}}
+Block{Name = "Stripped Warped Stem", Tab = "Building Blocks", Color = C(50, 120, 120), Texture = {TopBottom = "", Side = ""}}
+Block{Name = "Warped Hyphae", Tab = "Building Blocks", Color = C(50, 120, 120), Texture = {All = ""}}
+Block{Name = "Stripped Warped Hyphae", Tab = "Building Blocks", Color = C(50, 120, 120), Texture = {All = ""}}
+Block{Name = "Warped Planks", Tab = "Building Blocks", Color = C(50, 120, 120), Texture = {All = ""}}
+Block{Name = "Warped Fence", Tab = "Building Blocks", Color = C(50, 120, 120), Texture = {All = ""}}
+Block{Name = "Warped Fence Gate", Tab = "Building Blocks", Color = C(50, 120, 120), Texture = {All = ""}}
+Block{Name = "Warped Pressure Plate", Tab = "Building Blocks", Color = C(50, 120, 120), Texture = {All = ""}}
+Block{Name = "Warped Button", Tab = "Building Blocks", Color = C(50, 120, 120), Texture = {All = ""}}
+Block{Name = "Warped Trapdoor", Tab = "Building Blocks", Color = C(50, 120, 120), Shape = "Trapdoor", Material = Enum.Material.Wood, Base = "Warped Planks", Texture = {All = ""}}
+Block{Name = "Warped Trapdoor", Tab = "Redstone", Color = C(50, 120, 120), Shape = "Trapdoor", Material = Enum.Material.Wood, Base = "Warped Planks", Texture = {All = ""}}
+Block{Name = "Warped Door", Tab = "Building Blocks", Color = C(50, 120, 120), Shape = "Door", Material = Enum.Material.Wood, Texture = {TopBottom = "", Left = "", Right = "", Front = "", Back = ""}}
+
+-- Bamboo
+Block{Name = "Block of Bamboo", Tab = "Building Blocks", Color = C(120, 150, 50), Texture = {TopBottom = "91058038174620", Side = "73743924534329"}}
+Block{Name = "Block of Stripped Bamboo", Tab = "Building Blocks", Color = C(190, 170, 80), Texture = {TopBottom = "92371317271223", Side = "137376392887943"}}
+Block{Name = "Bamboo Mosaic", Tab = "Building Blocks", Color = C(190, 170, 80), Texture = {All = ""}}
