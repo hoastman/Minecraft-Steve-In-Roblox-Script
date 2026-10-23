@@ -18,7 +18,7 @@ Item{Name = "Stone Axe", Tab = "Combat", Color = C(128, 128, 128), Front = "1324
 Item{Name = "Iron Axe", Tab = "Combat", Color = C(190, 190, 195), Front = "13432739575", Stack = 1}
 Item{Name = "Golden Axe", Tab = "Combat", Color = C(240, 210, 60), Front = "9151121070", Stack = 1}
 Item{Name = "Diamond Axe", Tab = "Combat", Color = C(80, 220, 220), Front = "10399162901", Stack = 1}
-Item{Name = "Netherite Axe", Tab = "Combat", Color = C(80, 220, 220), Front = "17301699238", Stack = 1}
+Item{Name = "Netherite Axe", Tab = "Combat", Color = C(80, 220, 220), Front = "85720134946253", Stack = 1}
 
 Item{Name = "Trident", Tab = "Combat", Color = C(70, 160, 160), Front = "86144416756316", Stack = 1}
 Item{Name = "Mace", Tab = "Combat", Color = C(130, 110, 140), Front = "108464767252910", Stack = 1}
@@ -50,10 +50,10 @@ Item{Name = "Diamond Chestplate", Tab = "Combat", Color = C(80, 220, 220), Front
 Item{Name = "Diamond Leggings", Tab = "Combat", Color = C(80, 220, 220), Front = "", Stack = 1}
 Item{Name = "Diamond Boots", Tab = "Combat", Color = C(80, 220, 220), Front = "", Stack = 1}
 
-Item{Name = "Netherite Helmet", Tab = "Combat", Color = C(70, 60, 65), Front = "", Stack = 1}
-Item{Name = "Netherite Chestplate", Tab = "Combat", Color = C(70, 60, 65), Front = "", Stack = 1}
-Item{Name = "Netherite Leggings", Tab = "Combat", Color = C(70, 60, 65), Front = "", Stack = 1}
-Item{Name = "Netherite Boots", Tab = "Combat", Color = C(70, 60, 65), Front = "", Stack = 1}
+Item{Name = "Netherite Helmet", Tab = "Combat", Color = C(70, 60, 65), Front = "104360730048180", Stack = 1}
+Item{Name = "Netherite Chestplate", Tab = "Combat", Color = C(70, 60, 65), Front = "114194445382502", Stack = 1}
+Item{Name = "Netherite Leggings", Tab = "Combat", Color = C(70, 60, 65), Front = "83927132310794", Stack = 1}
+Item{Name = "Netherite Boots", Tab = "Combat", Color = C(70, 60, 65), Front = "103367924233238", Stack = 1}
 
 Item{Name = "Turtle Shell", Tab = "Combat", Color = C(60, 140, 70), Front = "", Stack = 1}
 
