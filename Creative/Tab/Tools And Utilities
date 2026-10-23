@@ -31,7 +31,7 @@ Item{Name = "Diamond Hoe", Tab = "Tools & Utilities", Color = C(80, 220, 220), F
 -- Netherite Tools
 Item{Name = "Netherite Shovel", Tab = "Tools & Utilities", Color = C(70, 60, 65), Front = "137930890018196", Stack = 1}
 Item{Name = "Netherite Pickaxe", Tab = "Tools & Utilities", Color = C(70, 60, 65), Front = "8131171623", Stack = 1}
-Item{Name = "Netherite Axe", Tab = "Tools & Utilities", Color = C(70, 60, 65), Front = "17301699238", Stack = 1}
+Item{Name = "Netherite Axe", Tab = "Tools & Utilities", Color = C(70, 60, 65), Front = "85720134946253", Stack = 1}
 Item{Name = "Netherite Hoe", Tab = "Tools & Utilities", Color = C(70, 60, 65), Front = "120210717917160", Stack = 1}
 
 -- Buckets
