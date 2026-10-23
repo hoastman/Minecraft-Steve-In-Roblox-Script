@@ -73,23 +73,20 @@ Item{Name = "Black Bundle", Tab = "Tools & Utilities", Color = C(30, 30, 35), Fr
 Item{Name = "Compass", Tab = "Tools & Utilities", Color = C(150, 150, 155), Front = "", Stack = 64}
 Item{Name = "Recovery Compass", Tab = "Tools & Utilities", Color = C(80, 180, 170), Front = "", Stack = 64}
 Item{Name = "Clock", Tab = "Tools & Utilities", Color = C(220, 190, 60), Front = "", Stack = 64}
-Item{Name = "Spyglass", Tab = "Tools & Utilities", Color = C(200, 150, 80), Front = "", Stack = 1}
-Item{Name = "Empty Map", Tab = "Tools & Utilities", Color = C(220, 200, 160), Front = "", Stack = 64}
-Item{Name = "Book and Quill", Tab = "Tools & Utilities", Color = C(150, 100, 70), Front = "", Stack = 1}
+Item{Name = "Spyglass", Tab = "Tools & Utilities", Color = C(200, 150, 80), Front = "71296598167746", Stack = 1}
+Item{Name = "Empty Map", Tab = "Tools & Utilities", Color = C(220, 200, 160), Front = "127380673908704", Stack = 64}
+Item{Name = "Book and Quill", Tab = "Tools & Utilities", Color = C(150, 100, 70), Front = "88297728257524", Stack = 1}
 
 -- Transport, Travel & Mobility
-Item{Name = "Wind Charge", Tab = "Tools & Utilities", Color = C(190, 210, 230), Front = "", Stack = 64}
-Item{Name = "Ender Pearl", Tab = "Tools & Utilities", Color = C(50, 120, 100), Front = "", Stack = 16}
-Item{Name = "Eye of Ender", Tab = "Tools & Utilities", Color = C(100, 170, 90), Front = "", Stack = 64}
-Item{Name = "Elytra", Tab = "Tools & Utilities", Color = C(140, 150, 160), Front = "", Stack = 1}
+Item{Name = "Wind Charge", Tab = "Tools & Utilities", Color = C(190, 210, 230), Front = "94832144713526", Stack = 64}
+Item{Name = "Ender Pearl", Tab = "Tools & Utilities", Color = C(50, 120, 100), Front = "90316895284428", Stack = 16}
+Item{Name = "Eye of Ender", Tab = "Tools & Utilities", Color = C(100, 170, 90), Front = "89136132147613", Stack = 64}
+Item{Name = "Elytra", Tab = "Tools & Utilities", Color = C(140, 150, 160), Front = "138575151895757", Stack = 1}
 
 Item{Name = "Firework Rocket Duration 1", Tab = "Tools & Utilities", Color = C(200, 70, 70), Front = "96620352366368", Stack = 64}
 Item{Name = "Firework Rocket Duration 2", Tab = "Tools & Utilities", Color = C(200, 70, 70), Front = "96620352366368", Stack = 64}
 Item{Name = "Firework Rocket Duration 3", Tab = "Tools & Utilities", Color = C(200, 70, 70), Front = "96620352366368", Stack = 64}
-
-Item{Name = "Saddle", Tab = "Tools & Utilities", Color = C(160, 90, 40), Front = "", Stack = 1}
-Item{Name = "Carrot on a Stick", Tab = "Tools & Utilities", Color = C(200, 110, 40), Front = "", Stack = 1}
-Item{Name = "Warped Fungus on a Stick", Tab = "Tools & Utilities", Color = C(50, 130, 130), Front = "", Stack = 1}
+Item{Name = "Saddle", Tab = "Tools & Utilities", Color = C(160, 90, 40), Front = "134430300374788", Stack = 1}
 
 -- Harnesses
 Item{Name = "White Harness", Tab = "Tools & Utilities", Color = C(240, 240, 240), Front = "", Stack = 1}
@@ -108,6 +105,9 @@ Item{Name = "Brown Harness", Tab = "Tools & Utilities", Color = C(120, 80, 50), 
 Item{Name = "Green Harness", Tab = "Tools & Utilities", Color = C(80, 110, 30), Front = "", Stack = 1}
 Item{Name = "Red Harness", Tab = "Tools & Utilities", Color = C(170, 40, 40), Front = "", Stack = 1}
 Item{Name = "Black Harness", Tab = "Tools & Utilities", Color = C(30, 30, 35), Front = "", Stack = 1}
+
+Item{Name = "Carrot on a Stick", Tab = "Tools & Utilities", Color = C(200, 110, 40), Front = "119695375756033", Stack = 1}
+Item{Name = "Warped Fungus on a Stick", Tab = "Tools & Utilities", Color = C(50, 130, 130), Front = "88601722872591", Stack = 1}
 
 -- Boats
 Item{Name = "Oak Boat", Tab = "Tools & Utilities", Color = C(190, 145, 80), Front = "", Stack = 1}
