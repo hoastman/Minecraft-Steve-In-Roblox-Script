@@ -83,9 +83,9 @@ Item{Name = "Ender Pearl", Tab = "Tools & Utilities", Color = C(50, 120, 100), F
 Item{Name = "Eye of Ender", Tab = "Tools & Utilities", Color = C(100, 170, 90), Front = "89136132147613", Stack = 64}
 Item{Name = "Elytra", Tab = "Tools & Utilities", Color = C(140, 150, 160), Front = "138575151895757", Stack = 1}
 
-Item{Name = "Firework Rocket Duration 1", Tab = "Tools & Utilities", Color = C(200, 70, 70), Front = "96620352366368", Stack = 64}
-Item{Name = "Firework Rocket Duration 2", Tab = "Tools & Utilities", Color = C(200, 70, 70), Front = "96620352366368", Stack = 64}
-Item{Name = "Firework Rocket Duration 3", Tab = "Tools & Utilities", Color = C(200, 70, 70), Front = "96620352366368", Stack = 64}
+Item{Name = "Firework Rocket", Tab = "Tools & Utilities", Color = C(200, 70, 70), Front = "96620352366368", Stack = 64}
+Item{Name = "Firework Rocket (Flight 2)", Tab = "Tools & Utilities", Color = C(200, 70, 70), Front = "96620352366368", Stack = 64}
+Item{Name = "Firework Rocket (Flight 3)", Tab = "Tools & Utilities", Color = C(200, 70, 70), Front = "96620352366368", Stack = 64}
 Item{Name = "Saddle", Tab = "Tools & Utilities", Color = C(160, 90, 40), Front = "134430300374788", Stack = 1}
 
 -- Harnesses
