@@ -25,30 +25,30 @@ Item{Name = "Mace", Tab = "Combat", Color = C(130, 110, 140), Front = "108464767
 Item{Name = "Shield", Tab = "Combat", Color = C(150, 120, 80), Front = "", Stack = 1}
 
 -- Player Armor
-Item{Name = "Leather Helmet", Tab = "Combat", Color = C(160, 90, 40), Front = "", Stack = 1}
-Item{Name = "Leather Chestplate", Tab = "Combat", Color = C(160, 90, 40), Front = "", Stack = 1}
-Item{Name = "Leather Leggings", Tab = "Combat", Color = C(160, 90, 40), Front = "", Stack = 1}
-Item{Name = "Leather Boots", Tab = "Combat", Color = C(160, 90, 40), Front = "", Stack = 1}
+Item{Name = "Leather Helmet", Tab = "Combat", Color = C(160, 90, 40), Front = "132712369403114", Stack = 1}
+Item{Name = "Leather Chestplate", Tab = "Combat", Color = C(160, 90, 40), Front = "109595261662158", Stack = 1}
+Item{Name = "Leather Leggings", Tab = "Combat", Color = C(160, 90, 40), Front = "104964383328971", Stack = 1}
+Item{Name = "Leather Boots", Tab = "Combat", Color = C(160, 90, 40), Front = "121899942990213", Stack = 1}
 
-Item{Name = "Chainmail Helmet", Tab = "Combat", Color = C(170, 170, 170), Front = "", Stack = 1}
-Item{Name = "Chainmail Chestplate", Tab = "Combat", Color = C(170, 170, 170), Front = "", Stack = 1}
-Item{Name = "Chainmail Leggings", Tab = "Combat", Color = C(170, 170, 170), Front = "", Stack = 1}
-Item{Name = "Chainmail Boots", Tab = "Combat", Color = C(170, 170, 170), Front = "", Stack = 1}
+Item{Name = "Chainmail Helmet", Tab = "Combat", Color = C(170, 170, 170), Front = "139381640105088", Stack = 1}
+Item{Name = "Chainmail Chestplate", Tab = "Combat", Color = C(170, 170, 170), Front = "114055491542773", Stack = 1}
+Item{Name = "Chainmail Leggings", Tab = "Combat", Color = C(170, 170, 170), Front = "92467620373790", Stack = 1}
+Item{Name = "Chainmail Boots", Tab = "Combat", Color = C(170, 170, 170), Front = "73699938459039", Stack = 1}
 
-Item{Name = "Iron Helmet", Tab = "Combat", Color = C(190, 190, 195), Front = "", Stack = 1}
-Item{Name = "Iron Chestplate", Tab = "Combat", Color = C(190, 190, 195), Front = "", Stack = 1}
-Item{Name = "Iron Leggings", Tab = "Combat", Color = C(190, 190, 195), Front = "", Stack = 1}
-Item{Name = "Iron Boots", Tab = "Combat", Color = C(190, 190, 195), Front = "", Stack = 1}
+Item{Name = "Iron Helmet", Tab = "Combat", Color = C(190, 190, 195), Front = "133806472590547", Stack = 1}
+Item{Name = "Iron Chestplate", Tab = "Combat", Color = C(190, 190, 195), Front = "78304805217006", Stack = 1}
+Item{Name = "Iron Leggings", Tab = "Combat", Color = C(190, 190, 195), Front = "85161910138561", Stack = 1}
+Item{Name = "Iron Boots", Tab = "Combat", Color = C(190, 190, 195), Front = "129724094623552", Stack = 1}
 
-Item{Name = "Golden Helmet", Tab = "Combat", Color = C(240, 210, 60), Front = "", Stack = 1}
-Item{Name = "Golden Chestplate", Tab = "Combat", Color = C(240, 210, 60), Front = "", Stack = 1}
-Item{Name = "Golden Leggings", Tab = "Combat", Color = C(240, 210, 60), Front = "", Stack = 1}
-Item{Name = "Golden Boots", Tab = "Combat", Color = C(240, 210, 60), Front = "", Stack = 1}
+Item{Name = "Golden Helmet", Tab = "Combat", Color = C(240, 210, 60), Front = "128938734041436", Stack = 1}
+Item{Name = "Golden Chestplate", Tab = "Combat", Color = C(240, 210, 60), Front = "128061935949375", Stack = 1}
+Item{Name = "Golden Leggings", Tab = "Combat", Color = C(240, 210, 60), Front = "97956269238787", Stack = 1}
+Item{Name = "Golden Boots", Tab = "Combat", Color = C(240, 210, 60), Front = "138280565530019", Stack = 1}
 
-Item{Name = "Diamond Helmet", Tab = "Combat", Color = C(80, 220, 220), Front = "", Stack = 1}
-Item{Name = "Diamond Chestplate", Tab = "Combat", Color = C(80, 220, 220), Front = "", Stack = 1}
-Item{Name = "Diamond Leggings", Tab = "Combat", Color = C(80, 220, 220), Front = "", Stack = 1}
-Item{Name = "Diamond Boots", Tab = "Combat", Color = C(80, 220, 220), Front = "", Stack = 1}
+Item{Name = "Diamond Helmet", Tab = "Combat", Color = C(80, 220, 220), Front = "136199418428756", Stack = 1}
+Item{Name = "Diamond Chestplate", Tab = "Combat", Color = C(80, 220, 220), Front = "97870031771583", Stack = 1}
+Item{Name = "Diamond Leggings", Tab = "Combat", Color = C(80, 220, 220), Front = "101697421997680", Stack = 1}
+Item{Name = "Diamond Boots", Tab = "Combat", Color = C(80, 220, 220), Front = "87268967868890", Stack = 1}
 
 Item{Name = "Netherite Helmet", Tab = "Combat", Color = C(70, 60, 65), Front = "104360730048180", Stack = 1}
 Item{Name = "Netherite Chestplate", Tab = "Combat", Color = C(70, 60, 65), Front = "114194445382502", Stack = 1}
@@ -89,4 +89,4 @@ Item{Name = "Firework Rocket Duration 1", Tab = "Combat", Color = C(200, 70, 70)
 Item{Name = "Firework Rocket Duration 2", Tab = "Combat", Color = C(200, 70, 70), Front = "134630586767422", Stack = 64}
 Item{Name = "Firework Rocket Duration 3", Tab = "Combat", Color = C(200, 70, 70), Front = "134630586767422", Stack = 64}
 
-Item{Name = "Arrow", Tab = "Combat", Color = C(160, 150, 140), Front = "124201447909249", Stack = 64}
+Item{Name = "Arrow", Tab = "Combat", Color = C(160, 150, 140), Front = "131614677866301", Stack = 64}
