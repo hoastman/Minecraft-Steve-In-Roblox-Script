@@ -85,8 +85,8 @@ Item{Name = "Wind Charge", Tab = "Combat", Color = C(190, 210, 230), Front = "",
 Item{Name = "Bow", Tab = "Combat", Color = C(140, 100, 60), Front = "14244367874", Stack = 1}
 Item{Name = "Crossbow", Tab = "Combat", Color = C(150, 110, 70), Front = "84769422270266", Stack = 1}
 
-Item{Name = "Firework Rocket Duration 1", Tab = "Combat", Color = C(200, 70, 70), Front = "134630586767422", Stack = 64}
-Item{Name = "Firework Rocket Duration 2", Tab = "Combat", Color = C(200, 70, 70), Front = "134630586767422", Stack = 64}
-Item{Name = "Firework Rocket Duration 3", Tab = "Combat", Color = C(200, 70, 70), Front = "134630586767422", Stack = 64}
+Item{Name = "Firework Rocket ", Tab = "Combat", Color = C(200, 70, 70), Front = "134630586767422", Stack = 64}
+Item{Name = "Firework Rocket (Flight 2)", Tab = "Combat", Color = C(200, 70, 70), Front = "134630586767422", Stack = 64}
+Item{Name = "Firework Rocket (Flight 3)", Tab = "Combat", Color = C(200, 70, 70), Front = "134630586767422", Stack = 64}
 
 Item{Name = "Arrow", Tab = "Combat", Color = C(160, 150, 140), Front = "131614677866301", Stack = 64}
