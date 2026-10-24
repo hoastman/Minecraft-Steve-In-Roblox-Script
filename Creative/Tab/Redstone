@@ -1,0 +1,29 @@
+-- Minecraft (Delta) - creative tab file: Redstone
+-- Loaded by Minecraft.lua from GitHub. It runs with these names already given to it:
+--   Block, Item, C, Slab, Stairs, Fence, FenceGate, Door, addShapes, BY_NAME
+-- (Block{..., Shapes = true} also makes the Slab + Stairs. Add / change your blocks here, then upload the file again.)
+local WHITE = Color3.new(1, 1, 1)
+
+Block{Name = "Oak Trapdoor", Tab = "Redstone", Color = C(190, 145, 80), Shape = "Trapdoor", Material = Enum.Material.Wood, Base = "Oak Planks",
+	Texture = {All = "rbxassetid://7388983206"}}
+
+-- ---- Redstone ----
+Block{Name = "Redstone Block", Tab = "Redstone", Color = C(170, 20, 20),
+	Texture = {All = "rbxassetid://8677288274"}}
+Block{Name = "Redstone Lamp", Tab = "Redstone", Color = C(215, 165, 85), Material = Enum.Material.Glass}
+Block{Name = "TNT", Tab = "Redstone", Color = C(205, 55, 45),
+	Texture = {TopBottom = "rbxassetid://5522034026", Side = "rbxassetid://5522032314"}}
+-- Observer: watches the block in front of its face. When that block is placed, broken or changes, the back of the Observer gives a short redstone pulse.
+Block{Name = "Observer", Tab = "Redstone", Color = C(98, 98, 104), Material = Enum.Material.Slate,
+	Texture = {Front = "rbxassetid://109397368070180", Back = "rbxassetid://94115153497612",
+		TopBottom = "rbxassetid://120933870509035", Side = "rbxassetid://83080825862528"}}
+-- Piston / Sticky Piston: powered by redstone they push the blocks in front of the head (up to 12). The Sticky Piston also pulls one block back.
+Block{Name = "Piston", Tab = "Redstone", Color = C(190, 145, 80), Shape = "Piston"}
+Block{Name = "Sticky Piston", Tab = "Redstone", Color = C(190, 145, 80), Shape = "Piston", Sticky = true}
+-- Iron Door / Iron Trapdoor: they can NOT be opened by hand, only by redstone (lever, button, pressure plate, dust, Redstone Block ...)
+Block{Name = "Iron Door", Tab = "Redstone", Color = C(214, 214, 220), Shape = "Door", Material = Enum.Material.Metal, RedstoneOnly = true, Texture = {}}
+Block{Name = "Iron Trapdoor", Tab = "Redstone", Color = C(205, 205, 212), Shape = "Trapdoor", Material = Enum.Material.Metal, RedstoneOnly = true, Texture = {}}
+Item{Name = "Redstone Dust", Tab = "Redstone", Color = C(190, 25, 25), Front = ""}
+Item{Name = "Lever", Tab = "Redstone", Color = C(120, 120, 120), Front = ""}
+Item{Name = "Stone Button", Tab = "Redstone", Color = C(130, 130, 130), Front = ""}
+Item{Name = "Pressure Plate", Tab = "Redstone", Color = C(130, 130, 130), Front = ""}

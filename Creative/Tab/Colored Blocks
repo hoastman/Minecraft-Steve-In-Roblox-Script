@@ -1,0 +1,40 @@
+-- Minecraft (Delta) - creative tab file: Colored Blocks
+-- Loaded by Minecraft.lua from GitHub. It runs with these names already given to it:
+--   Block, Item, C, Slab, Stairs, Fence, FenceGate, Door, addShapes, BY_NAME
+-- (Block{..., Shapes = true} also makes the Slab + Stairs. Add / change your blocks here, then upload the file again.)
+local WHITE = Color3.new(1, 1, 1)
+local WOOL = "rbxassetid://18699165714"
+
+-- ---- Colored Blocks (the wool image, tinted) ----
+do
+local WOOL_LIST = {
+	{"White", C(235, 235, 235)}, {"Light Gray", C(160, 160, 160)}, {"Gray", C(75, 80, 85)}, {"Black", C(25, 25, 30)},
+	{"Brown", C(115, 75, 45)}, {"Red", C(180, 40, 40)}, {"Orange", C(235, 125, 35)}, {"Yellow", C(240, 215, 50)},
+	{"Lime", C(125, 200, 35)}, {"Green", C(85, 115, 40)}, {"Cyan", C(30, 135, 150)}, {"Light Blue", C(95, 170, 225)},
+	{"Blue", C(50, 60, 160)}, {"Purple", C(125, 50, 170)}, {"Magenta", C(190, 70, 180)}, {"Pink", C(240, 150, 175)},
+}
+for _, w in ipairs(WOOL_LIST) do                         -- every wool first ...
+	Block{Name = w[1] .. " Wool", Tab = "Colored Blocks", Color = w[2], Tint = w[2], Texture = {All = WOOL}}
+end
+for _, w in ipairs(WOOL_LIST) do                         -- ... then every carpet
+	Block{Name = w[1] .. " Carpet", Tab = "Colored Blocks", Color = w[2], Tint = w[2], Texture = {All = WOOL}, Shape = "Carpet", Base = w[1] .. " Wool"}
+end
+-- terracotta: plain one first, then the 16 colours (muted clay colours like Minecraft)
+Block{Name = "Terracotta", Tab = "Colored Blocks", Color = C(152, 94, 67)}
+for _, t in ipairs({
+	{"White", C(209, 178, 161)}, {"Light Gray", C(135, 106, 97)}, {"Gray", C(57, 42, 35)}, {"Black", C(37, 22, 16)},
+	{"Brown", C(77, 51, 36)}, {"Red", C(143, 61, 46)}, {"Orange", C(161, 83, 37)}, {"Yellow", C(186, 133, 35)},
+	{"Lime", C(103, 117, 53)}, {"Green", C(76, 83, 42)}, {"Cyan", C(86, 91, 91)}, {"Light Blue", C(113, 108, 137)},
+	{"Blue", C(74, 59, 91)}, {"Purple", C(118, 70, 86)}, {"Magenta", C(149, 88, 108)}, {"Pink", C(161, 78, 78)},
+}) do
+	Block{Name = t[1] .. " Terracotta", Tab = "Colored Blocks", Color = t[2]}
+end
+for _, w in ipairs(WOOL_LIST) do                         -- concrete: smooth plain colours
+	Block{Name = w[1] .. " Concrete", Tab = "Colored Blocks", Color = w[2], Material = Enum.Material.Concrete}
+end
+for _, w in ipairs(WOOL_LIST) do                         -- concrete powder: falls like sand, turns into concrete when it touches Water
+	Block{Name = w[1] .. " Concrete Powder", Tab = "Colored Blocks", Color = w[2]:Lerp(WHITE, 0.12), Material = Enum.Material.Sand,
+		Texture = "rbxassetid://75162133167587", Tint = w[2]:Lerp(WHITE, 0.12),     -- one picture for all colours, painted with the colour of the powder
+		Gravity = true, Rotate = false, Powder = w[1] .. " Concrete"}
+end
+end

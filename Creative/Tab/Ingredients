@@ -1,0 +1,19 @@
+-- Minecraft (Delta) - creative tab file: Ingredients
+-- Loaded by Minecraft.lua from GitHub. It runs with these names already given to it:
+--   Block, Item, C, Slab, Stairs, Fence, FenceGate, Door, addShapes, BY_NAME
+-- (Block{..., Shapes = true} also makes the Slab + Stairs. Add / change your blocks here, then upload the file again.)
+local WHITE = Color3.new(1, 1, 1)
+
+Item{Name = "Paper", Tab = "Ingredients", Color = C(238, 238, 232), Front = ""}
+Item{Name = "Gunpowder", Tab = "Ingredients", Color = C(96, 96, 100), Front = ""}
+Item{Name = "Firework Star", Tab = "Ingredients", Color = C(235, 110, 160), Front = ""}          -- (optional in the rocket recipe: it gives the burst)
+
+-- ---- Ingredients ----
+Item{Name = "Stick", Tab = "Ingredients", Color = C(150, 105, 55), Front = "7248264418"}
+Item{Name = "Coal", Tab = "Ingredients", Color = C(40, 40, 45), Front = "109297824192906"}
+Item{Name = "Iron Ingot", Tab = "Ingredients", Color = C(210, 210, 215), Front = "11168808003"}
+Item{Name = "Gold Ingot", Tab = "Ingredients", Color = C(240, 200, 60), Front = "13506500866"}
+Item{Name = "Diamond", Tab = "Ingredients", Color = C(80, 225, 225), Front = "4938336468"}
+Item{Name = "Emerald", Tab = "Ingredients", Color = C(50, 200, 90), Front = "121398458687771"}
+Item{Name = "String", Tab = "Ingredients", Color = C(235, 235, 235), Front = ""}
+Item{Name = "Leather", Tab = "Ingredients", Color = C(150, 85, 45), Front = ""}

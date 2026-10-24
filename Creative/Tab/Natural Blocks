@@ -1,0 +1,35 @@
+-- Minecraft (Delta) - creative tab file: Natural Blocks
+-- Loaded by Minecraft.lua from GitHub. It runs with these names already given to it:
+--   Block, Item, C, Slab, Stairs, Fence, FenceGate, Door, addShapes, BY_NAME
+-- (Block{..., Shapes = true} also makes the Slab + Stairs. Add / change your blocks here, then upload the file again.)
+local WHITE = Color3.new(1, 1, 1)
+
+-- liquids + fire (you can walk into them; Lava / Fire hurt you in survival; Flint and Steel lights a Fire block)
+Block{Name = "Water", Tab = "Natural Blocks", Color = C(45, 100, 230), Transparency = 0.45, Liquid = "Water", Hidden = true}
+Block{Name = "Lava", Tab = "Natural Blocks", Color = C(255, 110, 15), Material = Enum.Material.Neon, Liquid = "Lava", Hidden = true}
+Block{Name = "Fire", Tab = "Natural Blocks", Color = C(255, 150, 20), Material = Enum.Material.Neon, Liquid = "Fire", Hidden = true}
+-- ores: they are the only blocks that give XP when you break them (stone texture, coloured)
+for _, o in ipairs({{"Coal Ore", C(95, 95, 95)}, {"Iron Ore", C(215, 185, 160)}, {"Gold Ore", C(235, 205, 90)}, {"Redstone Ore", C(230, 70, 70)},
+	{"Lapis Ore", C(60, 90, 210)}, {"Emerald Ore", C(70, 210, 100)}, {"Diamond Ore", C(110, 230, 230)}}) do
+	Block{Name = o[1], Tab = "Natural Blocks", Color = o[2], Tint = o[2], Texture = BY_NAME["Stone"] and BY_NAME["Stone"].Texture or {}}
+end
+-- ---- Nether blocks ----
+Block{Name = "Netherrack", Tab = "Natural Blocks", Color = C(112, 48, 48)}
+Block{Name = "Soul Sand", Tab = "Natural Blocks", Color = C(84, 65, 52)}
+Block{Name = "Magma Block", Tab = "Natural Blocks", Color = C(185, 75, 20), Material = Enum.Material.Neon}
+
+-- ---- Natural Blocks ----
+Block{Name = "Grass Block", Tab = "Natural Blocks", Color = C(91, 166, 60),
+	Texture = {Top = "rbxassetid://9267183930", Bottom = "rbxassetid://152569532", Side = "rbxassetid://9267155972"}}
+Block{Name = "Dirt", Tab = "Natural Blocks", Color = C(121, 85, 58),
+	Texture = {All = "rbxassetid://152569532"}}
+Block{Name = "Sand", Tab = "Natural Blocks", Color = C(226, 205, 140), Gravity = true, Rotate = false,
+	Texture = {All = "rbxassetid://9277770677"}}
+Block{Name = "Oak Log", Tab = "Natural Blocks", Color = C(105, 75, 45), Material = Enum.Material.Wood, Pillar = true,
+	Texture = {TopBottom = "104199545247654", Side = "128754006217410"}}
+Block{Name = "Leaves", Tab = "Natural Blocks", Color = C(60, 130, 50),
+	Texture = {All = "rbxassetid://14645147305"}}
+Block{Name = "Snow", Tab = "Natural Blocks", Color = C(245, 245, 250),
+	Texture = {All = "rbxassetid://11413422341"}}
+Block{Name = "Gravel", Tab = "Natural Blocks", Color = C(140, 135, 135), Material = Enum.Material.Pebble, Gravity = true, Rotate = false}
+Block{Name = "Clay", Tab = "Natural Blocks", Color = C(160, 166, 180)}

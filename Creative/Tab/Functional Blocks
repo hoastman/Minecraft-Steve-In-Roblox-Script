@@ -1,0 +1,17 @@
+-- Minecraft (Delta) - creative tab file: Functional Blocks
+-- Loaded by Minecraft.lua from GitHub. It runs with these names already given to it:
+--   Block, Item, C, Slab, Stairs, Fence, FenceGate, Door, addShapes, BY_NAME
+-- (Block{..., Shapes = true} also makes the Slab + Stairs. Add / change your blocks here, then upload the file again.)
+local WHITE = Color3.new(1, 1, 1)
+
+Block{Name = "Glowstone", Tab = "Functional Blocks", Color = C(240, 195, 105), Material = Enum.Material.Neon}
+
+-- ---- Functional Blocks (no image yet - add Texture = {...} to any of them) ----
+Block{Name = "Crafting Table", Tab = "Functional Blocks", Color = C(150, 105, 55),
+	Texture = {Top = "rbxassetid://14934173224", Bottom = "rbxassetid://7388983206", Left = "rbxassetid://14934148175", Right = "rbxassetid://14934153700", Front = "rbxassetid://14934148175", Back = "rbxassetid://14934153700"}}
+Block{Name = "Furnace", Tab = "Functional Blocks", Color = C(115, 115, 118), Facing = true,
+	Texture = {TopBottom = "rbxassetid://14934279364", Left = "14934293080", Right = "14934293080", Front = "14934285205", Back = "14934293080"}}
+Block{Name = "Chest", Tab = "Functional Blocks", Color = C(165, 115, 50), Material = Enum.Material.Wood, Facing = true,
+	Texture = {TopBottom = "rbxassetid://9228493629", Left = "91896449501050", Right = "91896449501050", Front = "9228492798", Back = "91896449501050"}}
+Block{Name = "Bookshelf", Tab = "Functional Blocks", Color = C(130, 95, 55), Material = Enum.Material.Wood,
+	Texture = {All = "rbxassetid://7388983206", Side = "rbxassetid://74480058575656"}}

@@ -1,0 +1,13 @@
+-- Minecraft (Delta) - creative tab file: Food & Drinks
+-- Loaded by Minecraft.lua from GitHub. It runs with these names already given to it:
+--   Block, Item, C, Slab, Stairs, Fence, FenceGate, Door, addShapes, BY_NAME
+-- (Block{..., Shapes = true} also makes the Slab + Stairs. Add / change your blocks here, then upload the file again.)
+local WHITE = Color3.new(1, 1, 1)
+
+-- ---- Food & Drinks ----
+Item{Name = "Apple", Tab = "Food & Drinks", Color = C(200, 40, 40), Front = "", Food = 4}
+Item{Name = "Bread", Tab = "Food & Drinks", Color = C(200, 150, 70), Front = "", Food = 5}
+Item{Name = "Cooked Beef", Tab = "Food & Drinks", Color = C(130, 70, 40), Front = "", Food = 8}
+Item{Name = "Golden Apple", Tab = "Food & Drinks", Color = C(240, 200, 60), Front = "", Food = 4}
+Item{Name = "Carrot", Tab = "Food & Drinks", Color = C(235, 130, 30), Front = "", Food = 3}
+Item{Name = "Water Bottle", Tab = "Food & Drinks", Color = C(70, 120, 220), Front = "", Drink = true, Stack = 1}

@@ -1,0 +1,14 @@
+-- Minecraft (Delta) - creative tab file: Operator Utilities
+-- Loaded by Minecraft.lua from GitHub. It runs with these names already given to it:
+--   Block, Item, C, Slab, Stairs, Fence, FenceGate, Door, addShapes, BY_NAME
+-- (Block{..., Shapes = true} also makes the Slab + Stairs. Add / change your blocks here, then upload the file again.)
+local WHITE = Color3.new(1, 1, 1)
+
+-- ---- Operator Utilities ----
+Block{Name = "Command Block", Tab = "Operator Utilities", Color = C(190, 120, 60),
+	Texture = {All = "rbxassetid://13989901645"}}
+Block{Name = "Structure Block", Tab = "Operator Utilities", Color = C(70, 60, 90)}
+Block{Name = "Barrier", Tab = "Operator Utilities", Color = C(220, 50, 50), Transparency = 0.98,
+	Sprite = "rbxassetid://112281900041174",                  -- in the world: a flat 2D picture that faces you (the inventory icon is still a cube)
+	Texture = {All = "rbxassetid://112281900041174"}}
+Item{Name = "Debug Stick", Tab = "Operator Utilities", Color = C(130, 190, 220), Front = "", Stack = 1}

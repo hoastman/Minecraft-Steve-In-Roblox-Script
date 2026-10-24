@@ -1,0 +1,12 @@
+-- Minecraft (Delta) - creative tab file: Spawn Eggs
+-- Loaded by Minecraft.lua from GitHub. It runs with these names already given to it:
+--   Block, Item, C, Slab, Stairs, Fence, FenceGate, Door, addShapes, BY_NAME
+-- (Block{..., Shapes = true} also makes the Slab + Stairs. Add / change your blocks here, then upload the file again.)
+local WHITE = Color3.new(1, 1, 1)
+
+-- ---- Spawn Eggs (just items for now) ----
+Item{Name = "Zombie Spawn Egg", Tab = "Spawn Eggs", Color = C(80, 140, 80), Front = ""}
+Item{Name = "Creeper Spawn Egg", Tab = "Spawn Eggs", Color = C(90, 190, 90), Front = ""}
+Item{Name = "Skeleton Spawn Egg", Tab = "Spawn Eggs", Color = C(205, 205, 205), Front = ""}
+Item{Name = "Pig Spawn Egg", Tab = "Spawn Eggs", Color = C(240, 160, 170), Front = ""}
+Item{Name = "Cow Spawn Egg", Tab = "Spawn Eggs", Color = C(100, 70, 50), Front = ""}
