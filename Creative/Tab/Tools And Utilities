@@ -74,7 +74,7 @@ Item{Name = "Compass", Tab = "Tools & Utilities", Color = C(150, 150, 155), Fron
 Item{Name = "Recovery Compass", Tab = "Tools & Utilities", Color = C(80, 180, 170), Front = "", Stack = 64}
 Item{Name = "Clock", Tab = "Tools & Utilities", Color = C(220, 190, 60), Front = "", Stack = 64}
 Item{Name = "Spyglass", Tab = "Tools & Utilities", Color = C(200, 150, 80), Front = "71296598167746", Stack = 1}
-Item{Name = "Empty Map", Tab = "Tools & Utilities", Color = C(220, 200, 160), Front = "127380673908704", Stack = 64}
+Item{Name = "Empty Map", Tab = "Tools & Utilities", Color = C(220, 200, 160), Front = "74569002431515", Stack = 64}
 Item{Name = "Book and Quill", Tab = "Tools & Utilities", Color = C(150, 100, 70), Front = "88297728257524", Stack = 1}
 
 -- Transport, Travel & Mobility
